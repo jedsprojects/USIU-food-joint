@@ -73,6 +73,61 @@ This writes products, orders, customers, messages, weekly stats, promo codes, an
 npm run dev
 ```
 
+## Deploy to Vercel
+
+This app is a **Vite SPA + PWA** configured for static hosting on Vercel.
+
+### 1. Import the repo
+
+1. Go to [vercel.com/new](https://vercel.com/new) and import `jedsprojects/USIU-food-joint`
+2. Vercel auto-detects Vite — build command `npm run build`, output directory `dist`
+3. [`vercel.json`](vercel.json) adds SPA rewrites and service-worker cache headers
+
+### 2. Environment variables (Vercel dashboard)
+
+Add these for **Production** and **Preview** (copy values from your local `.env`):
+
+| Variable | Purpose |
+|----------|---------|
+| `VITE_FIREBASE_API_KEY` | Firebase web client |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase auth |
+| `VITE_FIREBASE_PROJECT_ID` | Firebase project |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase storage |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging |
+| `VITE_FIREBASE_APP_ID` | Firebase app ID |
+| `VITE_FIREBASE_MEASUREMENT_ID` | Analytics |
+| `VITE_CLOUDINARY_CLOUD_NAME` | Image CDN |
+| `VITE_CLOUDINARY_UPLOAD_PRESET` | Unsigned upload preset |
+
+Do **not** add `FIREBASE_PRIVATE_KEY` or `FIREBASE_CLIENT_EMAIL` to Vercel — those are for local `npm run seed` only.
+
+### 3. Firebase authorized domains
+
+After the first deploy, add your Vercel URL in [Firebase Auth → Settings → Authorized domains](https://console.firebase.google.com/project/food-joint-usiu/authentication/settings):
+
+- `your-project.vercel.app`
+- Any custom domain you attach later
+
+Without this step, sign-in will fail on the deployed domain.
+
+### 4. PWA install
+
+Once deployed over HTTPS:
+
+- **Desktop (Chrome/Edge):** address bar → Install app
+- **Android:** Chrome menu → Add to Home screen
+- **iOS:** Safari Share → Add to Home Screen
+
+The service worker caches the app shell and static assets. Menu data, auth, and orders still require a network connection.
+
+### 5. Verify production build locally
+
+```bash
+npm run build && npm run preview
+```
+
+In Chrome DevTools → **Application**, confirm the manifest, service worker, and icons are valid.
+
 ## Cloudinary
 
 - Cloud name: `dkfb1kthv`
