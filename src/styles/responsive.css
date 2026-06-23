@@ -17,20 +17,34 @@
     height: 360px;
   }
 
-  .drop-card {
-    width: min(85vw, 220px);
-    height: 260px;
+  .hero-card__panel {
+    padding: var(--space-sm);
+    border-radius: 20px;
   }
 
-  .loyalty-bar {
+  .hero-add-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .loyalty-bar__row {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
 
-  .loyalty-bar > div:last-child {
+  .loyalty-bar__right {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .skeleton-block--hero {
+    height: 360px;
+  }
+
+  .skeleton-block--hero-panel {
+    height: 100px;
+    border-radius: 20px;
   }
 
   .bottom-nav__label {
@@ -85,11 +99,6 @@
     --layout-bottom-offset: calc(104px + env(safe-area-inset-bottom, 0px));
   }
 
-  .drop-card {
-    width: 260px;
-    height: 300px;
-  }
-
   .detail-view__floating-img {
     width: 280px;
     height: 280px;
@@ -131,40 +140,20 @@
     margin-top: 200px;
   }
 
-  .home-featured-row {
-    display: flex;
-    gap: var(--space-md);
+  .home-featured-stack {
+    flex-direction: row;
     align-items: stretch;
+    gap: var(--space-md);
   }
 
-  .home-featured-row .home-view__section {
+  .home-featured-stack .home-view__section--drops,
+  .home-featured-stack .home-view__section--hero {
+    flex: 1;
+    min-width: 0;
     margin-bottom: 0;
   }
 
-  .home-featured-row .home-view__section--drops {
-    flex: 0 0 280px;
-    min-width: 0;
-  }
-
-  .home-featured-row .home-view__section--hero {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .home-featured-row .drops-scroll {
-    flex-direction: column;
-    overflow-x: visible;
-    overflow-y: auto;
-    max-height: 440px;
-  }
-
-  .home-featured-row .drop-card {
-    width: 100%;
-    height: 200px;
-    flex-shrink: 0;
-  }
-
-  .home-featured-row .hero-card {
+  .home-featured-stack .hero-card {
     height: 440px;
   }
 

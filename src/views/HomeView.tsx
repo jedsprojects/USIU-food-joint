@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import type { Product, CustomerView } from '../context/StoreContext';
 import OptimizedImage from '../components/OptimizedImage';
+import HeroProductCard from '../components/HeroProductCard';
 import { usePreloadImage } from '../hooks/usePreloadImage';
 import { IMAGE_PRESETS } from '../utils/imageUrl';
+import { getTimeGreeting } from '../utils/greeting';
 
 interface Props { onNavigate: (view: CustomerView, product?: Product) => void; }
 
 const CATEGORIES = ['All', 'Burgers', 'Sides', 'Drinks', 'Desserts'];
+const TIER_MAX_POINTS = 2500;
 
 export default function HomeView({ onNavigate }: Props) {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -15,6 +18,7 @@ export default function HomeView({ onNavigate }: Props) {
 
   const available = products.filter(p => p.available);
   const drops = available.filter(p => p.isDrop);
+  const primaryDrop = drops[0];
   const featured = available.find(p => p.badge && !p.isDrop) || available[0];
   const filtered = activeCategory === 'All'
     ? available.filter(p => p.id !== featured?.id)
@@ -25,8 +29,15 @@ export default function HomeView({ onNavigate }: Props) {
     firestoreError?.toLowerCase().includes('permission') ||
     firestoreError?.toLowerCase().includes('insufficient');
 
+  const loyaltyProgress = Math.min(100, (loyaltyPoints / TIER_MAX_POINTS) * 100);
+
   usePreloadImage(
     featured?.image,
+    IMAGE_PRESETS.hero.width,
+    [...IMAGE_PRESETS.hero.srcSet],
+  );
+  usePreloadImage(
+    primaryDrop?.image,
     IMAGE_PRESETS.hero.width,
     [...IMAGE_PRESETS.hero.srcSet],
   );
@@ -34,103 +45,86 @@ export default function HomeView({ onNavigate }: Props) {
   return (
     <main className="home-view app-view fade-in-up">
 
-      {/* Loyalty Bar */}
-      <div className="loyalty-bar" onClick={() => onNavigate('loyalty')}>
-        <div className="loyalty-bar__left">
-          <span className="material-symbols-outlined fill-1" style={{ color: 'var(--color-tertiary)', fontSize: '18px' }}>workspace_premium</span>
-          <span className="font-label-md" style={{ color: 'var(--color-tertiary)', letterSpacing: '0.04em' }}>{loyaltyTier}</span>
-          <span style={{ color: 'rgba(255,177,196,0.3)', fontSize: '12px' }}>•</span>
-          <span className="font-label-md" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 400 }}>{loyaltyPoints.toLocaleString()} pts</span>
+      <section className="home-hero stagger-children" aria-label="Featured">
+
+        {/* Loyalty Bar */}
+        <div className="loyalty-bar" onClick={() => onNavigate('loyalty')} role="button" tabIndex={0}>
+          <div className="loyalty-bar__row">
+            <div className="loyalty-bar__left">
+              <span className="material-symbols-outlined fill-1 loyalty-bar__icon">workspace_premium</span>
+              <span className="loyalty-bar__tier font-label-md shimmer-text">{loyaltyTier}</span>
+              <span className="loyalty-bar__divider">•</span>
+              <span className="loyalty-bar__points font-label-md">{loyaltyPoints.toLocaleString()} pts</span>
+            </div>
+            <div className="loyalty-bar__right">
+              <div className="streak-badge">
+                <span className="material-symbols-outlined fill-1 streak-badge__icon">local_fire_department</span>
+                {streakDays}-day streak
+              </div>
+              <span className="material-symbols-outlined loyalty-bar__chevron">chevron_right</span>
+            </div>
+          </div>
+          <div className="loyalty-bar__progress" aria-hidden="true">
+            <div className="loyalty-bar__progress-fill" style={{ width: `${loyaltyProgress}%` }} />
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div className="streak-badge">🔥 {streakDays}-day streak</div>
-          <span className="material-symbols-outlined" style={{ color: 'rgba(255,177,196,0.4)', fontSize: '16px' }}>chevron_right</span>
-        </div>
-      </div>
 
-      {/* Greeting */}
-      <section className="home-view__greeting">
-        <p className="font-label-md" style={{ color: 'var(--color-primary-fixed-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px', opacity: 0.7 }}>
-          Good afternoon ✦
-        </p>
-        <h2 className="font-headline-lg" style={{ color: 'var(--color-on-surface)', marginBottom: '4px', lineHeight: 1.15 }}>
-          Gourmet Moments,
-        </h2>
-        <p className="font-body-lg" style={{ color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>
-          Served with indulgence.
-        </p>
-      </section>
+        {/* Greeting */}
+        <section className="home-hero__greeting">
+          <p className="home-hero__eyebrow">{getTimeGreeting()} ✦</p>
+          <h2 className="home-hero__headline font-headline-lg">Gourmet Moments,</h2>
+          <p className="home-hero__tagline font-body-lg">Served with indulgence.</p>
+        </section>
 
-      {/* Category Chips */}
-      <section className="category-chips scroll-hide">
-        {CATEGORIES.map(cat => (
-          <button
-            key={cat}
-            className={`category-chip ripple-btn ${activeCategory === cat ? 'category-chip--active' : ''}`}
-            onClick={() => setActiveCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </section>
+        {/* Categories + featured promos */}
+        <div className="home-hero__promos">
+          <section className="home-hero__categories category-chips scroll-hide">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                className={`category-chip ripple-btn ${activeCategory === cat ? 'category-chip--active' : ''}`}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </section>
 
-      {/* Today's Drop + Hero Featured */}
-      {(drops.length > 0 || featured) && (
-        <div className="home-featured-row">
-          {drops.length > 0 && (
-            <section className="home-view__section home-view__section--drops">
-              <div className="home-view__section-header">
-                <h3 className="font-headline-md" style={{ color: 'var(--color-on-surface)' }}>🔥 Today's Drop</h3>
-                <span className="drop-timer font-label-md">Limited Time</span>
-              </div>
-              <div className="drops-scroll scroll-hide">
-                {drops.map(p => (
-                  <div key={p.id} className="drop-card" onClick={() => onNavigate('detail', p)}>
-                    <OptimizedImage src={p.image} alt={p.name} className="drop-card__img" preset="dropCard" />
-                    <div className="drop-card__overlay" />
-                    <div className="drop-card__content">
-                      {p.badge && <span className="badge badge--gold" style={{ fontSize: '9px', marginBottom: '6px', display: 'inline-block' }}>{p.badge}</span>}
-                      <h4 className="font-headline-lg-mobile" style={{ color: '#fff', fontSize: '19px', marginBottom: '4px', lineHeight: 1.2 }}>{p.name}</h4>
-                      <span className="font-price-display" style={{ color: 'var(--color-tertiary-fixed)', fontSize: '20px' }}>${p.price.toFixed(2)}</span>
-                    </div>
+          {(primaryDrop || featured) && (
+            <div className="home-featured-stack">
+              {primaryDrop && (
+                <section className="home-view__section home-view__section--drops">
+                  <div className="home-hero__featured-header">
+                    <h3 className="font-headline-md home-hero__featured-title">Today&apos;s Drop</h3>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+                  <HeroProductCard
+                    product={primaryDrop}
+                    onNavigate={onNavigate}
+                    onAddToCart={addToCart}
+                  />
+                </section>
+              )}
 
-          {featured && (
-            <section className="home-view__section home-view__section--hero">
-              <div className="home-view__section-header">
-                <h3 className="font-headline-md shimmer-text" style={{ color: 'var(--color-on-surface)' }}>Flavor of the Week</h3>
-                <button className="see-all-btn ripple-btn" onClick={() => onNavigate('search')}>
-                  See All <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
-                </button>
-              </div>
-              <div className="hero-card" onClick={() => onNavigate('detail', featured)} role="button" tabIndex={0}>
-                <OptimizedImage className="hero-card__img" src={featured.image} alt={featured.name} preset="hero" priority />
-                <div className="hero-card__gradient" />
-                <div className="hero-card__content">
-                  <div className="hero-card__info">
-                    {featured.badge && <span className="badge badge--gold">{featured.badge}</span>}
-                    <h4 className="font-headline-lg-mobile" style={{ color: '#fff', marginBottom: '4px', marginTop: '8px' }}>{featured.name}</h4>
-                    <p className="font-body-md" style={{ color: 'rgba(255,255,255,0.65)', maxWidth: '200px', fontSize: '14px' }}>{featured.subtitle}</p>
-                  </div>
-                  <div className="hero-card__actions">
-                    <span className="font-price-display" style={{ color: 'var(--color-tertiary-fixed)' }}>${featured.price.toFixed(2)}</span>
-                    <button
-                      className="hero-add-btn ripple-btn"
-                      onClick={e => { e.stopPropagation(); addToCart(featured); }}
-                    >
-                      <span className="material-symbols-outlined fill-1">shopping_bag</span>
+              {featured && (
+                <section className="home-view__section home-view__section--hero">
+                  <div className="home-hero__featured-header">
+                    <h3 className="font-headline-md shimmer-text home-hero__featured-title">Flavor of the Week</h3>
+                    <button className="see-all-btn ripple-btn" onClick={() => onNavigate('search')}>
+                      See All <span className="material-symbols-outlined see-all-btn__icon">arrow_forward</span>
                     </button>
                   </div>
-                </div>
-              </div>
-            </section>
+                  <HeroProductCard
+                    product={featured}
+                    onNavigate={onNavigate}
+                    onAddToCart={addToCart}
+                    priority
+                  />
+                </section>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </section>
 
       {/* Product Grid */}
       <section className="home-view__section">
