@@ -123,15 +123,13 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-md);
-    align-items: stretch;
+    align-items: start;
   }
 
   .home-featured-stack .home-view__section--drops,
   .home-featured-stack .home-view__section--hero {
     margin-bottom: 0;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
   }
 
   .home-featured-stack > .home-view__section:only-child {
@@ -139,9 +137,9 @@
   }
 
   .home-featured-stack .hero-card {
-    flex: 1;
-    min-height: 380px;
-    height: auto;
+    height: 440px;
+    min-height: unset;
+    flex: unset;
   }
 }
 
@@ -163,10 +161,6 @@
 
   .detail-view__card-body {
     margin-top: 200px;
-  }
-
-  .home-featured-stack .hero-card {
-    min-height: 440px;
   }
 
   .bottom-nav {
