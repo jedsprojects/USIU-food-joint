@@ -1,7 +1,7 @@
 import { useState, useCallback, lazy, Suspense } from 'react';
 import './styles/global.css';
-import './styles/responsive.css';
 import './styles/components.css';
+import './styles/responsive.css';
 import { useAuth } from './context/AuthContext';
 import { useStore } from './context/StoreContext';
 import { AppProviders } from './context/AppProviders';

@@ -132,6 +132,18 @@
     min-width: 0;
   }
 
+  .home-featured-stack .home-view__section--drops {
+    grid-column: 1;
+  }
+
+  .home-featured-stack .home-view__section--hero {
+    grid-column: 2;
+  }
+
+  .home-featured-stack .home-hero__featured-header {
+    min-height: 40px;
+  }
+
   .home-featured-stack > .home-view__section:only-child {
     grid-column: 1 / -1;
   }
