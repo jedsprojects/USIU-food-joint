@@ -28,9 +28,7 @@ export default function ManagerLoginView({ onLogin, onBack }: Props) {
         <span className="material-symbols-outlined">arrow_back_ios_new</span>
       </button>
       <div className="glass-panel manager-login__card">
-        <span className="material-symbols-outlined fill-1 manager-login__icon">
-          admin_panel_settings
-        </span>
+        <img src="/food_b.png" alt="USIU Food Joint" className="manager-login__logo" />
 
         <h1 className="font-headline-xl shimmer-text manager-login__title">Manager Entry</h1>
         <p className="font-body-md manager-login__subtitle">Access Velvet Crumbs administrative controls</p>

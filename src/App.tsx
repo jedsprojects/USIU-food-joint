@@ -110,10 +110,10 @@ function AppInner() {
         <div className="manager-shell">
           <div className="manager-header">
             <div className="manager-header__brand">
-              <h1 className="manager-header__title font-headline-lg-mobile">
-                Velvet Crumbs{' '}
+              <div className="manager-header__title-row">
+                <img src="/food_b.png" alt="USIU Food Joint" className="manager-header__logo" />
                 <span className="manager-header__badge">ADMIN</span>
-              </h1>
+              </div>
               <p className="manager-header__subtitle font-label-md">{managerViewLabels[managerView]}</p>
             </div>
             <div className="manager-header__live">

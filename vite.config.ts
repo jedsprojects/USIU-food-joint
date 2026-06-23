@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['food_b.png', 'favicon.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'USIU Food Joint',
         short_name: 'Food Joint',

@@ -26,6 +26,26 @@
   letter-spacing: -0.01em;
 }
 
+.top-app-bar__logo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.top-app-bar__logo {
+  height: 40px;
+  width: auto;
+  max-width: min(180px, 42vw);
+  object-fit: contain;
+  display: block;
+}
+
 .top-app-bar__icon-btn {
   color: var(--color-primary);
   width: 40px;
@@ -973,6 +993,22 @@
   min-width: 0;
 }
 
+.manager-header__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.manager-header__logo {
+  height: 36px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
 .manager-header__title {
   font-style: italic;
   background: linear-gradient(135deg, var(--color-primary-fixed) 0%, var(--color-tertiary) 60%);
@@ -1048,6 +1084,16 @@
   margin-bottom: 16px;
   filter: drop-shadow(0 0 12px rgba(255, 177, 196, 0.4));
   display: block;
+}
+
+.manager-login__logo {
+  height: 72px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  margin: 0 auto 16px;
+  display: block;
+  filter: drop-shadow(0 0 12px rgba(255, 177, 196, 0.25));
 }
 
 .manager-login__title {

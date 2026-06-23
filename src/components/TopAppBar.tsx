@@ -58,21 +58,14 @@ export default function TopAppBar({ onNavigate, showBack, onBack }: Props) {
         </button>
       )}
 
-      <h1
-        className="top-app-bar__title font-headline-lg-mobile"
-        style={{
-          fontStyle: 'italic',
-          cursor: 'pointer',
-          background: 'linear-gradient(135deg, var(--color-primary-fixed) 0%, var(--color-tertiary) 60%, var(--color-primary) 100%)',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-          letterSpacing: '-0.01em',
-        }}
+      <button
+        type="button"
+        className="top-app-bar__logo-btn ripple-btn"
         onClick={() => onNavigate?.('home')}
+        aria-label="Go to home"
       >
-        Velvet Crumbs
-      </h1>
+        <img src="/food_b.png" alt="USIU Food Joint" className="top-app-bar__logo" />
+      </button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <button
