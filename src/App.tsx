@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import './styles/global.css';
 import './styles/responsive.css';
 import './styles/components.css';
@@ -13,25 +13,25 @@ import AmbientOrbs from './components/AmbientOrbs';
 import ToastContainer from './components/ToastContainer';
 import HomeSkeleton from './components/HomeSkeleton';
 
-/* Customer Views */
-import HomeView from './views/HomeView';
-import ProductDetailView from './views/ProductDetailView';
-import CartView from './views/CartView';
-import PreOrderView from './views/PreOrderView';
-import OrderConfirmView from './views/OrderConfirmView';
-import OrderTrackingView from './views/OrderTrackingView';
-import OrderHistoryView from './views/OrderHistoryView';
-import SearchView from './views/SearchView';
-import LoginView from './views/auth/LoginView';
-import GuestProfileView from './views/profile/GuestProfileView';
-import CustomerProfileView from './views/profile/CustomerProfileView';
+/* Customer Views — lazy loaded */
+const HomeView = lazy(() => import('./views/HomeView'));
+const ProductDetailView = lazy(() => import('./views/ProductDetailView'));
+const CartView = lazy(() => import('./views/CartView'));
+const PreOrderView = lazy(() => import('./views/PreOrderView'));
+const OrderConfirmView = lazy(() => import('./views/OrderConfirmView'));
+const OrderTrackingView = lazy(() => import('./views/OrderTrackingView'));
+const OrderHistoryView = lazy(() => import('./views/OrderHistoryView'));
+const SearchView = lazy(() => import('./views/SearchView'));
+const LoginView = lazy(() => import('./views/auth/LoginView'));
+const GuestProfileView = lazy(() => import('./views/profile/GuestProfileView'));
+const CustomerProfileView = lazy(() => import('./views/profile/CustomerProfileView'));
 
-/* Manager Views */
-import DashboardView from './views/manager/DashboardView';
-import OrdersManageView from './views/manager/OrdersManageView';
-import MenuManageView from './views/manager/MenuManageView';
-import CustomersView from './views/manager/CustomersView';
-import MessagingView from './views/manager/MessagingView';
+/* Manager Views — separate lazy chunk group */
+const DashboardView = lazy(() => import('./views/manager/DashboardView'));
+const OrdersManageView = lazy(() => import('./views/manager/OrdersManageView'));
+const MenuManageView = lazy(() => import('./views/manager/MenuManageView'));
+const CustomersView = lazy(() => import('./views/manager/CustomersView'));
+const MessagingView = lazy(() => import('./views/manager/MessagingView'));
 
 const AUTH_REQUIRED: CustomerView[] = ['profile', 'preorder', 'history', 'tracking'];
 
@@ -91,15 +91,7 @@ function AppInner() {
     settings: 'Settings',
   };
 
-  if (authLoading) {
-    return (
-      <>
-        <AmbientOrbs />
-        <ToastContainer />
-        <HomeSkeleton />
-      </>
-    );
-  }
+  const homeLoading = authLoading || (customerView === 'home' && isLoading);
 
   if (role === 'admin') {
     return (
@@ -137,15 +129,17 @@ function AppInner() {
             ))}
           </nav>
           <main className="manager-content">
-            <ViewSlide viewKey={managerView}>
-              {managerView === 'dashboard' && <DashboardView />}
-              {managerView === 'orders' && <OrdersManageView />}
-              {managerView === 'menu' && <MenuManageView />}
-              {managerView === 'customers' && <CustomersView />}
-              {managerView === 'messaging' && (
-                <MessagingView onExit={() => setManagerView('dashboard')} />
-              )}
-            </ViewSlide>
+            <Suspense fallback={<HomeSkeleton />}>
+              <ViewSlide viewKey={managerView}>
+                {managerView === 'dashboard' && <DashboardView />}
+                {managerView === 'orders' && <OrdersManageView />}
+                {managerView === 'menu' && <MenuManageView />}
+                {managerView === 'customers' && <CustomersView />}
+                {managerView === 'messaging' && (
+                  <MessagingView onExit={() => setManagerView('dashboard')} />
+                )}
+              </ViewSlide>
+            </Suspense>
           </main>
         </div>
       </>
@@ -153,30 +147,34 @@ function AppInner() {
   }
 
   const hideBottomNav = ['detail', 'preorder', 'confirm', 'tracking', 'login'].includes(customerView);
+  const showShell = !authLoading && customerView !== 'login';
 
   return (
     <>
       {showConfetti && <ConfettiCanvas />}
       <AmbientOrbs />
       <ToastContainer />
-      {customerView !== 'login' && (
+      {showShell && (
         <TopAppBar onNavigate={navCustomer} showBack={customerView !== 'home'} onBack={goBack} />
       )}
-      <ViewSlide viewKey={customerView}>
-        {customerView === 'home' && (isLoading ? <HomeSkeleton /> : <HomeView onNavigate={navCustomer} />)}
-        {customerView === 'detail' && selectedProduct && <ProductDetailView product={selectedProduct} onNavigate={navCustomer} />}
-        {customerView === 'cart' && <CartView onNavigate={navCustomer} />}
-        {customerView === 'preorder' && <PreOrderView onNavigate={navCustomer} />}
-        {customerView === 'confirm' && <OrderConfirmView onNavigate={navCustomer} />}
-        {customerView === 'tracking' && <OrderTrackingView onNavigate={navCustomer} />}
-        {customerView === 'history' && <OrderHistoryView onNavigate={navCustomer} />}
-        {customerView === 'search' && <SearchView onNavigate={navCustomer} />}
-        {customerView === 'login' && <LoginView onNavigate={navCustomer} returnTo={loginReturnTo} />}
-        {customerView === 'profile' && role === 'guest' && <GuestProfileView onNavigate={navCustomer} />}
-        {customerView === 'profile' && role === 'customer' && <CustomerProfileView onNavigate={navCustomer} />}
-        {customerView === 'profile' && !user && <LoginView onNavigate={navCustomer} returnTo="profile" />}
-      </ViewSlide>
-      {!hideBottomNav && <BottomNav currentView={customerView} onNavigate={navCustomer} />}
+      <Suspense fallback={<HomeSkeleton />}>
+        <ViewSlide viewKey={customerView}>
+          {homeLoading && customerView === 'home' && <HomeSkeleton />}
+          {!homeLoading && customerView === 'home' && <HomeView onNavigate={navCustomer} />}
+          {customerView === 'detail' && selectedProduct && <ProductDetailView product={selectedProduct} onNavigate={navCustomer} />}
+          {customerView === 'cart' && <CartView onNavigate={navCustomer} />}
+          {customerView === 'preorder' && <PreOrderView onNavigate={navCustomer} />}
+          {customerView === 'confirm' && <OrderConfirmView onNavigate={navCustomer} />}
+          {customerView === 'tracking' && <OrderTrackingView onNavigate={navCustomer} />}
+          {customerView === 'history' && <OrderHistoryView onNavigate={navCustomer} />}
+          {customerView === 'search' && <SearchView onNavigate={navCustomer} />}
+          {customerView === 'login' && <LoginView onNavigate={navCustomer} returnTo={loginReturnTo} />}
+          {customerView === 'profile' && role === 'guest' && <GuestProfileView onNavigate={navCustomer} />}
+          {customerView === 'profile' && role === 'customer' && <CustomerProfileView onNavigate={navCustomer} />}
+          {customerView === 'profile' && !user && <LoginView onNavigate={navCustomer} returnTo="profile" />}
+        </ViewSlide>
+      </Suspense>
+      {showShell && !hideBottomNav && <BottomNav currentView={customerView} onNavigate={navCustomer} />}
     </>
   );
 }

@@ -1,5 +1,6 @@
 import type { Product, CustomerView } from '../context/StoreContext';
 import { useStore } from '../context/StoreContext';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface Props { product: Product; onNavigate: (view: CustomerView) => void; }
 
@@ -15,7 +16,7 @@ export default function ProductDetailView({ product, onNavigate }: Props) {
           <h2 className="font-headline-lg-mobile" style={{ color: 'var(--color-on-surface)' }}>Signature {product.category}</h2>
         </div>
         <div className="detail-view__card">
-          <div className="detail-view__floating-img"><img src={product.image} alt={product.name} /></div>
+          <div className="detail-view__floating-img"><OptimizedImage src={product.image} alt={product.name} preset="detail" /></div>
           <div className="detail-view__card-body">
             <div className="detail-view__card-header">
               <div>

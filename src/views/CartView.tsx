@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { CustomerView, Product } from '../context/StoreContext';
 import { useStore } from '../context/StoreContext';
 import { addToast } from '../utils/toast';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface Props { onNavigate: (view: CustomerView, product?: Product) => void; }
 
@@ -39,7 +40,7 @@ export default function CartView({ onNavigate }: Props) {
       <div className="cart-items">
         {cart.map(({ product, quantity }) => (
           <div key={product.id} className="cart-item glass-panel">
-            <div className="cart-item__img-wrap"><img src={product.image} alt={product.name} className="cart-item__img" /></div>
+            <div className="cart-item__img-wrap"><OptimizedImage src={product.image} alt={product.name} className="cart-item__img" preset="cart" /></div>
             <div className="cart-item__info">
               <h3 className="font-headline-md cart-item__name" style={{ color: 'var(--color-primary-fixed)' }}>{product.name}</h3>
               <p className="font-label-md" style={{ color: 'var(--color-on-surface-variant)' }}>{product.category}</p>
@@ -94,7 +95,7 @@ export default function CartView({ onNavigate }: Props) {
           <div className="upsell-scroll scroll-hide">
             {upsells.map(p => (
               <div key={p.id} className="upsell-card" onClick={() => onNavigate('detail', p)}>
-                <img src={p.image} alt={p.name} className="upsell-card__img" />
+                <OptimizedImage src={p.image} alt={p.name} className="upsell-card__img" preset="cart" />
                 <span className="font-label-md" style={{ color: 'var(--color-on-surface)', fontSize: '12px' }}>{p.name}</span>
                 <span className="font-label-md" style={{ color: 'var(--color-tertiary-fixed)', fontSize: '12px' }}>${p.price.toFixed(2)}</span>
               </div>

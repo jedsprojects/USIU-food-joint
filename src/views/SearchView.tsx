@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import type { Product, CustomerView } from '../context/StoreContext';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface Props {
   onNavigate: (view: CustomerView, product?: Product) => void;
@@ -134,7 +135,7 @@ export default function SearchView({ onNavigate }: Props) {
           {filteredProducts.map(product => (
             <div key={product.id} className="product-card" onClick={() => onNavigate('detail', product)} role="button" tabIndex={0}>
               <div className="product-card__img-wrap">
-                <img className="product-card__img" src={product.image} alt={product.name} loading="lazy" />
+                <OptimizedImage className="product-card__img" src={product.image} alt={product.name} preset="productCard" />
                 {!product.available && (
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <span className="badge badge--ghost" style={{ background: 'var(--color-error)', color: '#fff' }}>Sold Out</span>

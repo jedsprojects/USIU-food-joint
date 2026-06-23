@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useAuth } from '../context/AuthContext';
 import type { CustomerView } from '../context/StoreContext';
+import OptimizedImage from './OptimizedImage';
 
 interface Props {
   onNavigate?: (view: CustomerView) => void;
@@ -29,7 +30,7 @@ export default function TopAppBar({ onNavigate, showBack, onBack }: Props) {
   };
 
   const avatarContent = userProfile?.avatarUrl ? (
-    <img src={userProfile.avatarUrl} alt="User avatar" />
+    <OptimizedImage src={userProfile.avatarUrl} alt="User avatar" preset="avatar" />
   ) : (
     <span className="material-symbols-outlined" style={{ fontSize: '20px', color: 'var(--color-primary)' }}>person</span>
   );

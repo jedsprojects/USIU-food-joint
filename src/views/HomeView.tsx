@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import type { Product, CustomerView } from '../context/StoreContext';
+import OptimizedImage from '../components/OptimizedImage';
+import { usePreloadImage } from '../hooks/usePreloadImage';
+import { IMAGE_PRESETS } from '../utils/imageUrl';
 
 interface Props { onNavigate: (view: CustomerView, product?: Product) => void; }
 
@@ -21,6 +24,12 @@ export default function HomeView({ onNavigate }: Props) {
   const isPermissionError =
     firestoreError?.toLowerCase().includes('permission') ||
     firestoreError?.toLowerCase().includes('insufficient');
+
+  usePreloadImage(
+    featured?.image,
+    IMAGE_PRESETS.hero.width,
+    [...IMAGE_PRESETS.hero.srcSet],
+  );
 
   return (
     <main className="home-view app-view fade-in-up">
@@ -77,7 +86,7 @@ export default function HomeView({ onNavigate }: Props) {
               <div className="drops-scroll scroll-hide">
                 {drops.map(p => (
                   <div key={p.id} className="drop-card" onClick={() => onNavigate('detail', p)}>
-                    <img src={p.image} alt={p.name} className="drop-card__img" />
+                    <OptimizedImage src={p.image} alt={p.name} className="drop-card__img" preset="dropCard" />
                     <div className="drop-card__overlay" />
                     <div className="drop-card__content">
                       {p.badge && <span className="badge badge--gold" style={{ fontSize: '9px', marginBottom: '6px', display: 'inline-block' }}>{p.badge}</span>}
@@ -99,7 +108,7 @@ export default function HomeView({ onNavigate }: Props) {
                 </button>
               </div>
               <div className="hero-card" onClick={() => onNavigate('detail', featured)} role="button" tabIndex={0}>
-                <img className="hero-card__img" src={featured.image} alt={featured.name} loading="eager" />
+                <OptimizedImage className="hero-card__img" src={featured.image} alt={featured.name} preset="hero" priority />
                 <div className="hero-card__gradient" />
                 <div className="hero-card__content">
                   <div className="hero-card__info">
@@ -150,7 +159,7 @@ export default function HomeView({ onNavigate }: Props) {
               tabIndex={0}
             >
               <div className="product-card__img-wrap">
-                <img className="product-card__img" src={product.image} alt={product.name} loading="lazy" />
+                <OptimizedImage className="product-card__img" src={product.image} alt={product.name} preset="productCard" />
                 {product.isDrop && <span className="product-card__drop-badge">🔥</span>}
               </div>
               <div className="product-card__body">

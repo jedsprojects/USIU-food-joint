@@ -6,6 +6,7 @@ import { addToast } from '../../utils/toast';
 import { stripUndefined, mapFirestoreError } from '../../utils/firestore';
 import { uploadImage } from '../../utils/cloudinary';
 import LoyaltyView from '../LoyaltyView';
+import OptimizedImage from '../../components/OptimizedImage';
 
 interface Props {
   onNavigate: (view: CustomerView) => void;
@@ -125,7 +126,7 @@ export default function CustomerProfileView({ onNavigate }: Props) {
               style={{ width: '80px', height: '80px', borderRadius: '50%', margin: '0 auto 12px', overflow: 'hidden', cursor: 'pointer', position: 'relative', border: '2px solid rgba(255,177,196,0.3)' }}
             >
               {userProfile?.avatarUrl ? (
-                <img src={userProfile.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <OptimizedImage src={userProfile.avatarUrl} alt="Avatar" preset="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{ width: '100%', height: '100%', background: 'var(--color-primary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '36px', color: 'var(--color-primary)' }}>person</span>

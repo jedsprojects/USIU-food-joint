@@ -142,6 +142,42 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     unsubs.push(
       onSnapshot(
+        collection(db, 'promoCodes'),
+        snapshot => {
+          const codes: Record<string, PromoCode> = {};
+          snapshot.docs.forEach(d => {
+            codes[d.id] = d.data() as PromoCode;
+          });
+          setPromoCodes(codes);
+        },
+        onError('promoCodes'),
+      ),
+    );
+
+    const timeout = setTimeout(stopLoading, 8000);
+
+    return () => {
+      unsubs.forEach(unsub => unsub());
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  // Admin-only listeners — deferred until admin role is confirmed
+  useEffect(() => {
+    if (!isAdmin) {
+      setCustomers([]);
+      setWeeklyStats([]);
+      return;
+    }
+
+    const unsubs: (() => void)[] = [];
+    const onError = (label: string) => (err: unknown) => {
+      console.error(`Firestore ${label} listener error:`, err);
+      setFirestoreError(mapFirestoreError(err));
+    };
+
+    unsubs.push(
+      onSnapshot(
         collection(db, 'messages'),
         snapshot => {
           const msgData = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Message));
@@ -173,27 +209,32 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       ),
     );
 
-    unsubs.push(
-      onSnapshot(
-        collection(db, 'promoCodes'),
-        snapshot => {
-          const codes: Record<string, PromoCode> = {};
-          snapshot.docs.forEach(d => {
-            codes[d.id] = d.data() as PromoCode;
-          });
-          setPromoCodes(codes);
-        },
-        onError('promoCodes'),
-      ),
+    return () => unsubs.forEach(unsub => unsub());
+  }, [isAdmin]);
+
+  // Customer messages — deferred until authenticated non-admin user
+  useEffect(() => {
+    if (isAdmin) return;
+
+    if (!user || isGuest) {
+      setMessages([]);
+      return;
+    }
+
+    const unsub = onSnapshot(
+      collection(db, 'messages'),
+      snapshot => {
+        const msgData = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Message));
+        setMessages(msgData);
+      },
+      err => {
+        console.error('Firestore messages listener error:', err);
+        setFirestoreError(mapFirestoreError(err));
+      },
     );
 
-    const timeout = setTimeout(stopLoading, 8000);
-
-    return () => {
-      unsubs.forEach(unsub => unsub());
-      clearTimeout(timeout);
-    };
-  }, []);
+    return unsub;
+  }, [user, isAdmin, isGuest]);
 
   // User-scoped orders listener
   useEffect(() => {

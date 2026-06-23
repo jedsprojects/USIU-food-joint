@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import type { Product } from '../../context/StoreContext';
 import { uploadImage } from '../../utils/cloudinary';
+import { resizeImageFile } from '../../utils/imageResize';
 import { addToast } from '../../utils/toast';
+import OptimizedImage from '../../components/OptimizedImage';
 
 const DEFAULT_IMAGE =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBgYtfrcdT6SlneXTT8B3Nfb2vm0aMSgjRggQ9z9tVsSTqMtC9CQH2zorPhTkRhwrGyQwsl7s0eutnhyWf3s_urSJdxObQeXpPb0d04exdPyBS9akbRHl6W4Iui7Sld9KrG1_DD2we5e1zcEpljbwsnNiab3sXEO-hd88ojh5JRHkuIaJmWVngBDA-NL_LQVNHmN6_hwebVcjGgJ4VxeuWUW9QR0kLSKH0fdyFwATD19v5Mlt56gWB6ht597nNE1KCaoUi6smY0G3UP';
@@ -52,7 +54,8 @@ export default function MenuManageView() {
     try {
       let imageUrl = DEFAULT_IMAGE;
       if (imageFile) {
-        imageUrl = await uploadImage(imageFile, 'food-joint/products');
+        const resized = await resizeImageFile(imageFile);
+        imageUrl = await uploadImage(resized, 'food-joint/products');
       }
 
       await addProduct({
@@ -92,7 +95,8 @@ export default function MenuManageView() {
       };
 
       if (editImageFile) {
-        updates.image = await uploadImage(editImageFile, 'food-joint/products');
+        const resized = await resizeImageFile(editImageFile);
+        updates.image = await uploadImage(resized, 'food-joint/products');
       }
 
       await updateProduct(editingProduct.id, updates);
@@ -200,7 +204,7 @@ export default function MenuManageView() {
               </select>
             </div>
             <div className="glass-panel" style={{ padding: '12px', borderRadius: '8px', border: '1px dashed rgba(255,177,196,0.3)', position: 'relative', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <img src={editingProduct.image} alt="" style={{ width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover' }} />
+            <OptimizedImage src={editingProduct.image} alt="" preset="managerThumb" style={{ width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover' }} />
               <input type="file" accept="image/*" onChange={e => setEditImageFile(e.target.files?.[0] ?? null)} style={{ flex: 1, color: 'var(--color-on-surface-variant)', fontSize: '13px' }} />
             </div>
             <button type="submit" disabled={uploading} className="cart-checkout-btn ripple-btn" style={{ width: '100%', padding: '12px', background: 'var(--color-tertiary-fixed)', color: 'var(--color-on-tertiary-fixed)', opacity: uploading ? 0.6 : 1 }}>
@@ -221,7 +225,7 @@ export default function MenuManageView() {
             border: '1px solid rgba(255, 177, 196, 0.1)',
             opacity: product.available ? 1 : 0.6,
           }}>
-            <img src={product.image} alt={product.name} style={{ width: '56px', height: '56px', borderRadius: 'var(--radius-xl)', objectFit: 'cover' }} />
+            <OptimizedImage src={product.image} alt={product.name} preset="managerThumb" style={{ width: '56px', height: '56px', borderRadius: 'var(--radius-xl)', objectFit: 'cover' }} />
 
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
