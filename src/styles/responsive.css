@@ -1,0 +1,402 @@
+/* ==========================================
+   RESPONSIVE LAYOUT – Velvet Crumbs
+   ========================================== */
+
+/* --- Narrow phones --- */
+@media (max-width: 374px) {
+  :root {
+    --space-container-margin: 16px;
+    --layout-bottom-offset: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-card {
+    height: 360px;
+  }
+
+  .drop-card {
+    width: min(85vw, 220px);
+    height: 260px;
+  }
+
+  .loyalty-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .loyalty-bar > div:last-child {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .bottom-nav__label {
+    display: none;
+  }
+
+  .bottom-nav__item {
+    padding: 8px 6px !important;
+  }
+
+  .upsell-card {
+    width: min(70vw, 100px);
+  }
+
+  .time-slot-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .manager-tab__label {
+    display: none;
+  }
+
+  .manager-tab {
+    padding: 10px 14px;
+  }
+
+  .pipeline-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Small tablets (640px+) --- */
+@media (min-width: 640px) {
+  :root {
+    --content-max-width: 720px;
+    --space-container-margin: 24px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .time-slot-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* --- Tablets (768px+) --- */
+@media (min-width: 768px) {
+  :root {
+    --layout-top-offset: calc(72px + env(safe-area-inset-top, 0px));
+    --layout-bottom-offset: calc(104px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .drop-card {
+    width: 260px;
+    height: 300px;
+  }
+
+  .detail-view__floating-img {
+    width: 280px;
+    height: 280px;
+  }
+
+  .detail-view__card-body {
+    margin-top: 180px;
+  }
+
+  .preorder-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    align-items: start;
+  }
+
+  .preorder-form-grid > * {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* --- Desktop (1024px+) --- */
+@media (min-width: 1024px) {
+  :root {
+    --content-max-width: 960px;
+    --space-container-margin: 32px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .detail-view__floating-img {
+    width: 300px;
+    height: 300px;
+  }
+
+  .detail-view__card-body {
+    margin-top: 200px;
+  }
+
+  .home-featured-row {
+    display: flex;
+    gap: var(--space-md);
+    align-items: stretch;
+  }
+
+  .home-featured-row .home-view__section {
+    margin-bottom: 0;
+  }
+
+  .home-featured-row .home-view__section--drops {
+    flex: 0 0 280px;
+    min-width: 0;
+  }
+
+  .home-featured-row .home-view__section--hero {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .home-featured-row .drops-scroll {
+    flex-direction: column;
+    overflow-x: visible;
+    overflow-y: auto;
+    max-height: 440px;
+  }
+
+  .home-featured-row .drop-card {
+    width: 100%;
+    height: 200px;
+    flex-shrink: 0;
+  }
+
+  .home-featured-row .hero-card {
+    height: 440px;
+  }
+
+  .bottom-nav {
+    max-width: 560px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  .orders-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .messaging-layout {
+    grid-template-columns: minmax(260px, 32%) minmax(0, 1fr);
+  }
+
+  .messaging-chat {
+    display: flex;
+  }
+
+  .time-slot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  /* Manager desktop: flex column (header + tabs + scrollable content) */
+  .manager-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    width: 100%;
+  }
+
+  #root:has(.manager-shell) {
+    max-width: none;
+    width: 100%;
+  }
+
+  .manager-content {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .manager-content > * {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+  }
+
+  .manager-content .messaging-view {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
+
+  .manager-content .messaging-layout {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    grid-template-columns: minmax(260px, 32%) minmax(0, 1fr);
+  }
+}
+
+/* --- Large desktop (1280px+) --- */
+@media (min-width: 1280px) {
+  :root {
+    --content-max-width: 1080px;
+  }
+
+  .manager-content {
+    padding: var(--space-lg) var(--space-xl);
+  }
+}
+
+/* --- Default product grid (375px – 639px) --- */
+@media (min-width: 375px) and (max-width: 639px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .time-slot-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* --- Detail view floating image on small screens --- */
+@media (max-width: 374px) {
+  .detail-view__floating-img {
+    width: 200px;
+    height: 200px;
+  }
+
+  .detail-view__card-body {
+    margin-top: 140px;
+  }
+}
+
+/* --- Manager mobile + messaging (below split breakpoint) --- */
+@media (max-width: 1023px) {
+  .messaging-view,
+  .messaging-view--list,
+  .messaging-layout,
+  .messaging-inbox {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .messaging-view {
+    padding-bottom: 0;
+    gap: 0;
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+
+  .messaging-layout {
+    grid-template-columns: 1fr;
+    min-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+    border: none;
+  }
+
+  .messaging-inbox {
+    border-right: none;
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+
+  .messaging-chat {
+    display: none;
+  }
+
+  .messaging-layout--chat-open .messaging-inbox {
+    display: none;
+  }
+
+  .messaging-layout--chat-open .messaging-chat {
+    display: flex;
+  }
+
+  #root:has(.messaging-view--list),
+  #root:has(.messaging-layout--chat-open) {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Immersive full-screen Chats list */
+  .manager-shell:has(.messaging-view) .manager-content {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .manager-shell:has(.messaging-view--list) .manager-tabs,
+  .manager-shell:has(.messaging-view--list) .manager-header {
+    display: none;
+  }
+
+  .manager-shell:has(.messaging-view--list) .manager-content {
+    padding: 0;
+  }
+
+  .messaging-view--list {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .messaging-view--list .messaging-layout {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    height: 100%;
+  }
+
+  .messaging-view--list .messaging-chats-header {
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  }
+
+  /* Immersive full-screen chat */
+  .manager-shell:has(.messaging-layout--chat-open) .manager-tabs,
+  .manager-shell:has(.messaging-layout--chat-open) .manager-header {
+    display: none;
+  }
+
+  .manager-shell:has(.messaging-layout--chat-open) .manager-content {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .messaging-layout--chat-open .messaging-chat {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    min-height: 100dvh;
+    height: 100dvh;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .messaging-layout--chat-open .messaging-chat__header {
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+
+  .dashboard-view__header {
+    display: none;
+  }
+}
+
+/* --- Toast container safe area --- */
+.toast-container {
+  top: calc(var(--layout-top-offset) + 8px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}

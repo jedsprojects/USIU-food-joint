@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Velvet Crumbs - Gourmet Burger Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-secondary-fixed-variant": "#484745",
+                  "secondary-fixed": "#e5e2df",
+                  "tertiary-fixed": "#ffe088",
+                  "error-container": "#93000a",
+                  "on-primary-fixed-variant": "#822144",
+                  "error": "#ffb4ab",
+                  "tertiary-container": "#cba72f",
+                  "surface": "#181214",
+                  "surface-container-highest": "#3a3335",
+                  "inverse-on-surface": "#362f31",
+                  "on-primary": "#63052e",
+                  "background": "#181214",
+                  "surface-bright": "#3f3739",
+                  "surface-variant": "#3a3335",
+                  "on-primary-container": "#f0789b",
+                  "on-tertiary-fixed-variant": "#574500",
+                  "on-error-container": "#ffdad6",
+                  "on-secondary-container": "#b7b4b2",
+                  "tertiary-fixed-dim": "#e9c349",
+                  "primary-fixed-dim": "#ffb1c4",
+                  "on-secondary-fixed": "#1c1b1a",
+                  "on-tertiary": "#3c2f00",
+                  "inverse-surface": "#ecdfe2",
+                  "secondary-fixed-dim": "#c9c6c3",
+                  "tertiary": "#e9c349",
+                  "on-primary-fixed": "#3f001a",
+                  "surface-container-high": "#2f282a",
+                  "surface-container-low": "#201a1c",
+                  "outline-variant": "#554246",
+                  "on-secondary": "#31302f",
+                  "primary": "#ffb1c4",
+                  "on-tertiary-fixed": "#241a00",
+                  "surface-container": "#241e20",
+                  "inverse-primary": "#a1395b",
+                  "primary-container": "#6b0d33",
+                  "secondary-container": "#484745",
+                  "on-surface": "#ecdfe2",
+                  "surface-container-lowest": "#120d0f",
+                  "on-surface-variant": "#dbc0c5",
+                  "primary-fixed": "#ffd9e0",
+                  "on-background": "#ecdfe2",
+                  "surface-tint": "#ffb1c4",
+                  "on-tertiary-container": "#4e3d00",
+                  "on-error": "#690005",
+                  "outline": "#a38b8f",
+                  "surface-dim": "#181214",
+                  "secondary": "#c9c6c3"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "gutter": "16px",
+                  "xs": "8px",
+                  "sm": "16px",
+                  "xl": "48px",
+                  "container-margin": "20px",
+                  "md": "24px",
+                  "base": "4px",
+                  "lg": "32px"
+          },
+          "fontFamily": {
+                  "headline-lg-mobile": ["Playfair Display"],
+                  "price-display": ["Playfair Display"],
+                  "headline-md": ["Playfair Display"],
+                  "headline-lg": ["Playfair Display"],
+                  "label-md": ["Hanken Grotesk"],
+                  "body-md": ["Hanken Grotesk"],
+                  "headline-xl": ["Playfair Display"],
+                  "body-lg": ["Hanken Grotesk"]
+          },
+          "fontSize": {
+                  "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                  "price-display": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                  "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                  "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                  "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                  "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .glass-nav {
+      background: rgba(107, 13, 51, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .burger-shadow {
+      filter: drop-shadow(0 20px 30px rgba(107, 13, 51, 0.4));
+    }
+    .scroll-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scroll-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-primary-container text-on-surface font-body-md min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-container-margin py-xs fixed top-0 z-50 bg-primary-container">
+<button class="text-primary hover:opacity-80 transition-opacity scale-95 active:transition-transform">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary italic">Velvet Crumbs</h1>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest border border-primary/20 overflow-hidden hover:opacity-80 transition-opacity">
+<img class="w-full h-full object-cover" data-alt="A stylized, close-up profile avatar of a sophisticated gourmet enthusiast, shot in a high-fashion editorial style with warm, moody lighting. The person has a refined look, set against a dark burgundy background that matches the brand's deep primary colors. The lighting is soft and cinematic, highlighting sharp features and a polished aesthetic consistent with a luxury patisserie and burger brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD26uJAqNFqXz1jsED1Y2AChKjCgJhLT_aj6uNN4B8J7do-2z31Zz-Eu2N4o7KfCfULjJwcoLUgjLxaWC50C96gWhRFPM5_mZQ2r28LFLJ-inynp1j1f_ezwSZAnkLoCq6DrKiQ-jUeHWtS3IH_S5UJ1MJ3sIHBg-uld51aKdcavF8kCXw_6gponsMq2WrCJoJo1qL7u3Tfz4fDoksSfumcGM1j2L4K7EdWQUOwow5IYfs7pImjg8mvjSGygRLZGzk-pULBY5PUsQwj"/>
+</div>
+</header>
+<main class="pt-16 max-w-lg mx-auto">
+<!-- Hero Image Section (Following Screen 3 Layout) -->
+<section class="relative px-container-margin pt-md">
+<div class="flex flex-col items-start mb-xs">
+<span class="text-label-md font-label-md text-tertiary-fixed bg-on-primary-fixed-variant/30 px-3 py-1 rounded-full uppercase tracking-widest mb-2">Category</span>
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface">Signature Burgers</h2>
+</div>
+<!-- Main Product Display -->
+<div class="relative bg-secondary-fixed rounded-[40px] p-gutter mt-12 flex flex-col items-center">
+<div class="absolute -top-20 w-64 h-64 burger-shadow transform hover:scale-105 transition-transform duration-500">
+<img class="w-full h-full object-contain" data-alt="A macro, cinematic shot of a gourmet wagyu beef burger. The burger features a glossy brioche bun topped with black sesame seeds, layered with melted aged cheddar, caramelized onions, crisp heirloom tomato slices, and fresh arugula. The lighting is dramatic and moody, focusing on the succulent textures and rich colors, set against a blurred deep burgundy and cream background to evoke a sense of high-end, affordable luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrfu369aNttrRW_ufBV8jk4lcRVoWszX2oiNHBOQgM8_SL7esIz9y-wtdU8IbtS7tzDWNXAJUlUW8mRj13T_dUyFeswzRTj-AahOiw0OOFtgdjFq0q_QGjB0OlrZoPb_I6U54b9bIvi6IQS2lZD6dChwMRtF7j2oi4g1pMb-nygYB6R8t62InqEUm-YHQ6ooxMAvDXUeGlJwHDmpzr6aNDfOPJ9lJAAydHAfiPa4cMOlVYUyUhdhb1A_ltJUlhmMcG8UHPzCg6NaIA"/>
+</div>
+<div class="mt-40 w-full text-left">
+<div class="flex justify-between items-end mb-xs">
+<div>
+<h3 class="text-headline-md font-headline-md text-on-secondary">The Velvet Swirl</h3>
+<p class="text-body-md font-body-md text-on-secondary-fixed-variant mt-1">Premium Wagyu &amp; Truffle Aioli</p>
+</div>
+<span class="text-price-display font-price-display text-primary-container">$24.00</span>
+</div>
+<div class="flex gap-2 items-center bg-on-secondary-fixed/5 p-2 rounded-xl w-max">
+<span class="material-symbols-outlined text-primary-container text-sm">star</span>
+<span class="text-label-md font-label-md text-on-secondary">4.9 (120 reviews)</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Specifications Section (Following Screen 3 Structure) -->
+<section class="mt-lg px-container-margin">
+<h4 class="text-headline-md font-headline-md text-on-surface mb-sm">Specification</h4>
+<div class="bg-secondary-fixed rounded-[32px] p-sm space-y-4">
+<!-- Spec Row 1 -->
+<div class="flex justify-between items-center pb-4 border-b border-on-secondary-fixed/10">
+<div>
+<p class="text-label-md font-label-md text-on-secondary-fixed-variant">Portion Size</p>
+<p class="text-body-lg font-body-lg text-on-secondary">Single Patty (250g)</p>
+</div>
+<span class="material-symbols-outlined text-primary-container">restaurant</span>
+</div>
+<!-- Spec Row 2 -->
+<div class="flex justify-between items-center pb-4 border-b border-on-secondary-fixed/10">
+<div>
+<p class="text-label-md font-label-md text-on-secondary-fixed-variant">Calories</p>
+<p class="text-body-lg font-body-lg text-on-secondary">850 kcal</p>
+</div>
+<span class="material-symbols-outlined text-primary-container">local_fire_department</span>
+</div>
+<!-- Spec Row 3 -->
+<div class="flex justify-between items-center">
+<div>
+<p class="text-label-md font-label-md text-on-secondary-fixed-variant">Preparation Time</p>
+<p class="text-body-lg font-body-lg text-on-secondary">15 - 20 mins</p>
+</div>
+<span class="material-symbols-outlined text-primary-container">schedule</span>
+</div>
+</div>
+</section>
+<!-- Description -->
+<section class="mt-lg px-container-margin pb-12">
+<h4 class="text-headline-md font-headline-md text-on-surface mb-sm">Chef's Note</h4>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed">
+        Our signature Velvet Swirl burger is crafted with hand-massaged Wagyu beef, infused with a hint of smoked paprika and rosemary. We layer this over a bed of slow-caramelized onions and top it with our secret Velvet Truffle Aioli, all encased in a toasted, artisanal gold-leaf brioche bun.
+      </p>
+</section>
+</main>
+<!-- Persistent Floating Action Area -->
+<div class="fixed bottom-24 left-0 right-0 z-40 px-container-margin flex justify-center">
+<button class="bg-tertiary-fixed text-on-tertiary-fixed w-full max-w-md py-5 rounded-[32px] font-label-md text-label-md flex items-center justify-center gap-3 shadow-xl shadow-tertiary-fixed/20 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+      ADD TO CART — $24.00
+    </button>
+</div>
+<!-- Bottom Navigation Shell (JSON Defined) -->
+<nav class="fixed bottom-6 left-0 right-0 z-50 flex justify-around items-center px-lg py-sm mx-auto max-w-md glass-nav rounded-full shadow-xl shadow-primary-container/20">
+<button class="text-on-primary-container/60 p-3 hover:text-tertiary-fixed transition-colors active:scale-90 transition-all">
+<span class="material-symbols-outlined">home</span>
+</button>
+<button class="text-on-primary-container/60 p-3 hover:text-tertiary-fixed transition-colors active:scale-90 transition-all">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="text-tertiary-fixed bg-on-primary-fixed-variant/20 rounded-full p-3 active:scale-90 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+</button>
+<button class="text-on-primary-container/60 p-3 hover:text-tertiary-fixed transition-colors active:scale-90 transition-all">
+<span class="material-symbols-outlined">person</span>
+</button>
+</nav>
+<script>
+    // Micro-interaction for specification rows
+    document.querySelectorAll('.bg-secondary-fixed > div').forEach(row => {
+      row.addEventListener('click', () => {
+        row.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+          row.style.transform = 'scale(1)';
+        }, 100);
+      });
+    });
+  </script>
+</body></html>
