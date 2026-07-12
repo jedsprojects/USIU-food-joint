@@ -1,0 +1,130 @@
+/* ==========================================
+   KWA GAVO DESIGN TOKENS
+   ========================================== */
+
+:root {
+  /* === COLORS — eye-comfort palette: lower contrast, warmer tones === */
+  --color-background:               #0c0708;
+  --color-surface:                  #0c0708;
+  --color-surface-dim:              #0a0506;
+  --color-surface-bright:           #2f2325;
+  --color-surface-container-lowest: #060304;
+  --color-surface-container-low:    #120a0c;
+  --color-surface-container:        #160f11;
+  --color-surface-container-high:   #221619;
+  --color-surface-container-highest:#2a1d20;
+  --color-surface-variant:          #2a1d20;
+
+  /* Softened text: warm cream instead of near-white */
+  --color-on-surface:               #ebdcdb;
+  --color-on-surface-variant:       #d0babb;
+  --color-on-background:            #ebdcdb;
+
+  /* Inverse */
+  --color-inverse-surface:          #ebdcdb;
+  --color-inverse-on-surface:       #36282a;
+
+  --color-outline:                  #856a6d;
+  --color-outline-variant:          #4a3739;
+
+  /* Fiery primary orange-red */
+  --color-primary:                  #ff4500;
+  --color-on-primary:               #ffffff;
+  --color-primary-container:        #501505;
+  --color-on-primary-container:     #ffaa90;
+  --color-primary-fixed:            #ffccbc;
+  --color-primary-fixed-dim:        #ff8a65;
+  --color-on-primary-fixed:         #2d0c01;
+  --color-on-primary-fixed-variant: #7a2608;
+  --color-inverse-primary:          #d84315;
+  --color-surface-tint:             #ff4500;
+
+  /* Secondary neutral warm */
+  --color-secondary:                #d5c3c6;
+  --color-on-secondary:             #2e2d2c;
+  --color-secondary-container:      #434140;
+  --color-on-secondary-container:   #a8a5a2;
+  --color-secondary-fixed:          #dad7d4;
+  --color-secondary-fixed-dim:      #bab7b4;
+  --color-on-secondary-fixed:       #1a1918;
+  --color-on-secondary-fixed-variant:#434140;
+
+  /* Warm fire yellow-gold */
+  --color-tertiary:                 #ffd700;
+  --color-on-tertiary:              #1a1000;
+  --color-tertiary-container:       #b09000;
+  --color-on-tertiary-container:    #ffd700;
+  --color-tertiary-fixed:           #ffe082;
+  --color-tertiary-fixed-dim:       #ffd54f;
+  --color-on-tertiary-fixed:        #261200;
+  --color-on-tertiary-fixed-variant:#5d3300;
+
+  --color-error:                    #e8a09a;
+  --color-on-error:                 #5c0003;
+  --color-error-container:          #820008;
+  --color-on-error-container:       #f0cac7;
+
+  /* === MESSAGING (WhatsApp-style roles) === */
+  --msg-header-bg:        var(--color-primary-container);
+  --msg-header-fg:        var(--color-primary-fixed);
+  --msg-outgoing-bg:      #cc3700;
+  --msg-outgoing-fg:      #ffffff;
+  --msg-incoming-bg:      var(--color-surface-container-highest);
+  --msg-incoming-fg:      var(--color-on-surface);
+  --msg-wallpaper:        #080405;
+  --msg-composer-bg:      #12090b;
+
+  /* === TYPOGRAPHY === */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans:  'Hanken Grotesk', system-ui, sans-serif;
+
+  /* === BREAKPOINTS (for reference in media queries) === */
+  --bp-xs:  375px;
+  --bp-sm:  640px;
+  --bp-md:  768px;
+  --bp-lg:  1024px;
+  --bp-xl:  1280px;
+
+  /* === LAYOUT === */
+  --content-max-width:      100%;
+  --layout-top-offset:      calc(64px + env(safe-area-inset-top, 0px));
+  --layout-bottom-offset:   calc(96px + env(safe-area-inset-bottom, 0px));
+  --layout-detail-bottom:   calc(120px + env(safe-area-inset-bottom, 0px));
+
+  /* === SPACING === */
+  --space-base:             4px;
+  --space-xs:               8px;
+  --space-sm:               16px;
+  --space-md:               24px;
+  --space-lg:               32px;
+  --space-xl:               48px;
+  --space-container-margin: 20px;
+  --space-gutter:           16px;
+
+  /* === BORDER RADIUS === */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  20px;
+  --radius-card: 32px;
+  --radius-full: 9999px;
+
+  /* === SHADOWS — reduced intensity for softer depth === */
+  --shadow-primary: 0px 6px 20px rgba(90, 10, 42, 0.18);
+  --shadow-gold:    0px 6px 20px rgba(180, 140, 50, 0.18);
+  --shadow-nav:     0px 8px 28px rgba(90, 10, 42, 0.25);
+  --shadow-card:    0 2px 8px rgba(0,0,0,0.16), 0 0 0 1px rgba(220,160,180,0.04);
+  --shadow-card-hover: 0 10px 32px rgba(0,0,0,0.28), 0 0 0 1px rgba(220,160,180,0.1), 0 0 48px -20px rgba(90,10,42,0.22);
+  --shadow-elevated: 0 16px 48px rgba(0,0,0,0.32), 0 0 60px -20px rgba(90,10,42,0.15);
+
+  /* === TRANSITIONS === */
+  --transition-fast:   0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* === PREMIUM GLOWS — halved intensity for eye comfort === */
+  --glow-primary: 0 0 32px -12px rgba(200,140,160,0.1);
+  --glow-gold:    0 0 32px -12px rgba(180,140,50,0.12);
+}

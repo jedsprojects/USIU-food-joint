@@ -1,0 +1,118 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Detects hardcoded admin emails via the Firebase Auth token — never trusts the client body.
+    function isHardcodedAdminEmail() {
+      return isSignedIn()
+        && request.auth.token.email != null
+        && request.auth.token.email in ['admin@kwagavo.com'];
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      // Hardcoded admins may create their own doc with role='admin'.
+      // All other users may only self-create with safe starting values.
+      allow create: if isSignedIn() && request.auth.uid == userId && (
+        (
+          isHardcodedAdminEmail() &&
+          request.resource.data.get('role', 'customer') == 'admin'
+        ) || (
+          !isHardcodedAdminEmail() &&
+          request.resource.data.get('role', 'customer') == 'customer' &&
+          request.resource.data.get('loyaltyPoints', 0) == 0 &&
+          request.resource.data.get('tier', 'Gavo Regular') == 'Gavo Regular' &&
+          request.resource.data.get('streakDays', 0) == 0
+        )
+      );
+
+      // Admins and hardcoded-admin emails may update any field (including role).
+      // Regular owners may update only non-privileged fields.
+      allow update: if isAdmin() || isHardcodedAdminEmail() || (
+        isOwner(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'loyaltyPoints', 'tier', 'streakDays'])
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll(['userId', 'customer', 'status', 'total'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.total >= 0
+        && request.resource.data.get('subtotal', 0) >= 0;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /messages/{messageId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && (
+          resource.data.userId == request.auth.uid
+          || resource.data.customerId == request.auth.uid
+        ));
+      allow create: if isSignedIn() && (
+        (request.resource.data.userId == request.auth.uid && request.resource.data.customerId == request.auth.uid)
+        || isAdmin()
+      );
+      allow update: if isAdmin()
+        || (isSignedIn() && (
+          (resource.data.userId == request.auth.uid || resource.data.customerId == request.auth.uid)
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.customerId == resource.data.customerId
+        ));
+      allow delete: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isAdmin();
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isAdmin();
+    }
+
+    match /customers/{customerId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /promoCodes/{codeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /weeklyStats/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /meta/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

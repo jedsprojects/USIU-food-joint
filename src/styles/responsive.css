@@ -1,0 +1,434 @@
+/* ==========================================
+   RESPONSIVE LAYOUT – Kwa Gavo
+   Mobile-first, full-range responsive system.
+   Breakpoints: xs<375, sm=375-639, md=640-767,
+   lg=768-1023, xl=1024-1279, 2xl=1280-1535, 3xl=1536+
+   ========================================== */
+
+/* ==========================================
+   TOAST CONTAINER SAFE AREA
+   ========================================== */
+.toast-container {
+  top: calc(var(--layout-top-offset) + 8px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* ==========================================
+   EXTRA-SMALL PHONES (< 375px) — e.g. iPhone SE 1st gen
+   ========================================== */
+@media (max-width: 374px) {
+  :root {
+    --space-container-margin: 14px;
+    --layout-bottom-offset: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+
+  html { font-size: 14px; }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+
+  .hero-card { height: 320px; }
+  .hero-card__panel { padding: var(--space-sm); border-radius: 20px; }
+  .hero-add-btn { width: 44px; height: 44px; }
+
+  .loyalty-bar__row { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .loyalty-bar__right { width: 100%; justify-content: space-between; }
+  .loyalty-bar__divider { display: none; }
+
+  .skeleton-block--hero { height: 320px; }
+  .skeleton-block--hero-panel { height: 100px; border-radius: 20px; }
+
+  /* Nav */
+  .bottom-nav__label { display: none; }
+  .bottom-nav__item { padding: 8px 6px !important; }
+  .bottom-nav { padding: 10px 12px; }
+
+  /* Cart */
+  .upsell-card { width: min(72vw, 160px); }
+
+  /* Preorder */
+  .time-slot-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Manager */
+  .manager-tab__label { display: none; }
+  .manager-tab { padding: 10px 12px; }
+  .pipeline-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Detail view */
+  .detail-view__floating-img { width: 180px; height: 180px; }
+  .detail-view__card-body { margin-top: 120px; }
+
+  /* Top bar */
+  .top-app-bar__logo { height: 32px; max-width: 130px; }
+
+  /* Headings */
+  .home-hero__headline { font-size: clamp(20px, 7vw, 26px); }
+  .home-hero__tagline { font-size: 14px; }
+}
+
+/* ==========================================
+   SMALL PHONES (375px – 479px) — iPhone SE 2+, most Androids
+   ========================================== */
+@media (min-width: 375px) and (max-width: 479px) {
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .time-slot-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ==========================================
+   LARGE PHONES (480px – 639px) — Plus/Max sizes
+   ========================================== */
+@media (min-width: 480px) and (max-width: 639px) {
+  :root { --space-container-margin: 20px; }
+
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-card { height: 420px; }
+  .time-slot-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Bottom nav: show labels on larger phones */
+  .bottom-nav__item {
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px;
+  }
+  .bottom-nav__label { display: block; font-size: 9px; }
+}
+
+/* ==========================================
+   SMALL TABLETS / LARGE PHONES (640px+)
+   ========================================== */
+@media (min-width: 640px) {
+  :root {
+    --content-max-width: 720px;
+    --space-container-margin: 24px;
+  }
+
+  .product-grid { grid-template-columns: repeat(3, 1fr); }
+  .time-slot-grid { grid-template-columns: repeat(3, 1fr); }
+
+  .bottom-nav {
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    max-width: 520px;
+  }
+
+  /* Hero taller on wider screens */
+  .hero-card { height: 440px; }
+
+  /* Loyalty bar always horizontal */
+  .loyalty-bar__row { flex-direction: row; }
+}
+
+/* ==========================================
+   TABLETS (768px+) — iPad mini, iPad, Android tablets
+   ========================================== */
+@media (min-width: 768px) {
+  :root {
+    --content-max-width: 800px;
+    --layout-top-offset: calc(72px + env(safe-area-inset-top, 0px));
+    --layout-bottom-offset: calc(104px + env(safe-area-inset-bottom, 0px));
+    --space-container-margin: 28px;
+  }
+
+  html { font-size: 16px; }
+
+  /* Product grid: 3 cols on tablet */
+  .product-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+
+  /* Featured cards side by side */
+  .home-featured-stack {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    align-items: start;
+  }
+  .home-featured-stack .home-view__section--drops,
+  .home-featured-stack .home-view__section--hero { margin-bottom: 0; min-width: 0; }
+  .home-featured-stack .home-view__section--drops { grid-column: 1; }
+  .home-featured-stack .home-view__section--hero  { grid-column: 2; }
+  .home-featured-stack .home-hero__featured-header { min-height: 40px; }
+  .home-featured-stack > .home-view__section:only-child { grid-column: 1 / -1; }
+  .home-featured-stack .hero-card { height: 440px; min-height: unset; flex: unset; }
+
+  /* Detail view */
+  .detail-view__floating-img { width: 280px; height: 280px; }
+  .detail-view__card-body    { margin-top: 180px; }
+
+  /* Preorder grid 2 cols */
+  .preorder-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    align-items: start;
+  }
+  .preorder-form-grid > * { margin-bottom: 0 !important; }
+
+  /* Time slots */
+  .time-slot-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Bottom nav wider */
+  .bottom-nav { max-width: 560px; }
+
+  /* Category chips: slightly larger on tablet */
+  .category-chip { padding: 11px 24px; }
+
+  /* Upsell scroll wider */
+  .upsell-card { width: min(44vw, 200px); }
+
+  /* Manager */
+  .stats-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ==========================================
+   DESKTOP (1024px+) — Laptops, monitors
+   ========================================== */
+@media (min-width: 1024px) {
+  :root {
+    --content-max-width: 960px;
+    --space-container-margin: 32px;
+  }
+
+  html { font-size: 16px; }
+
+  /* Product grid 4-up */
+  .product-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Detail view */
+  .detail-view__floating-img { width: 300px; height: 300px; }
+  .detail-view__card-body    { margin-top: 200px; }
+
+  /* Navbar pill narrower on wide screens */
+  .bottom-nav { max-width: 560px; }
+
+  /* Manager: two-column orders */
+  .stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
+  .orders-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  /* Messaging sidebar split */
+  .messaging-layout { grid-template-columns: minmax(260px, 32%) minmax(0, 1fr); }
+  .messaging-chat   { display: flex; }
+
+  /* Time slots fluid */
+  .time-slot-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+
+  /* Manager shell full-height */
+  .manager-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    width: 100%;
+  }
+  #root:has(.manager-shell) { max-width: none; width: 100%; }
+
+  .manager-content {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .manager-content > * { flex: 1; min-height: 0; width: 100%; }
+
+  /* Messaging full height inside manager */
+  .manager-content .messaging-view {
+    flex: 1; min-height: 0; display: flex; flex-direction: column;
+    width: 100%; max-width: none; margin: 0; border: none; border-radius: 0;
+  }
+  .manager-content .messaging-layout {
+    flex: 1; min-height: 0; height: 100%;
+    grid-template-columns: minmax(260px, 32%) minmax(0, 1fr);
+  }
+
+  /* Nav drawer wider on desktop */
+  .nav-drawer { width: min(75vw, 360px); }
+
+  /* Cart gets max width */
+  .cart-view { max-width: 700px; margin-inline: auto; }
+
+  /* Product detail gets side layout */
+  .detail-view__card { border-radius: 48px 48px 0 0; }
+
+  /* Upsell card */
+  .upsell-card { width: 220px; }
+
+  /* Category chip hover improvements */
+  .category-chip { font-size: 13px; }
+}
+
+/* ==========================================
+   LARGE DESKTOP (1280px+) — Wide monitors
+   ========================================== */
+@media (min-width: 1280px) {
+  :root {
+    --content-max-width: 1080px;
+  }
+
+  .manager-content { padding: var(--space-lg) var(--space-xl); }
+
+  /* 5-col product grid on very wide screens */
+  .product-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Hero cards taller */
+  .hero-card { height: 480px; }
+  .home-featured-stack .hero-card { height: 480px; }
+
+  /* Wider detail floating image */
+  .detail-view__floating-img { width: 340px; height: 340px; }
+  .detail-view__card-body    { margin-top: 220px; }
+
+  /* Preorder 3-col */
+  .time-slot-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+}
+
+/* ==========================================
+   EXTRA-LARGE DESKTOP (1536px+) — 4K, ultra-wide
+   ========================================== */
+@media (min-width: 1536px) {
+  :root {
+    --content-max-width: 1200px;
+    --space-container-margin: 40px;
+  }
+
+  .product-grid { grid-template-columns: repeat(5, 1fr); }
+  .hero-card { height: 520px; }
+  .home-featured-stack .hero-card { height: 520px; }
+}
+
+/* ==========================================
+   MOBILE MESSAGING FULL-SCREEN (< 1024px)
+   ========================================== */
+@media (max-width: 1023px) {
+  .messaging-view,
+  .messaging-view--list,
+  .messaging-layout,
+  .messaging-inbox { width: 100%; max-width: 100%; }
+
+  .messaging-view {
+    padding-bottom: 0; gap: 0; min-height: 100dvh; height: 100dvh;
+  }
+
+  .messaging-layout {
+    grid-template-columns: 1fr;
+    min-height: 100dvh; height: 100dvh;
+    border-radius: 0; border: none;
+  }
+
+  .messaging-inbox { border-right: none; min-height: 100dvh; height: 100dvh; }
+  .messaging-chat  { display: none; }
+
+  .messaging-layout--chat-open .messaging-inbox { display: none; }
+  .messaging-layout--chat-open .messaging-chat  { display: flex; }
+
+  #root:has(.messaging-view--list),
+  #root:has(.messaging-layout--chat-open) { max-width: 100%; width: 100%; }
+
+  /* Full-screen chat list */
+  .manager-shell:has(.messaging-view) .manager-content { padding: 0; margin: 0; width: 100%; max-width: 100%; }
+  .manager-shell:has(.messaging-view--list) .manager-tabs,
+  .manager-shell:has(.messaging-view--list) .manager-header { display: none; }
+  .manager-shell:has(.messaging-view--list) .manager-content { padding: 0; }
+
+  .messaging-view--list {
+    position: fixed; inset: 0; z-index: 55;
+    width: 100%; max-width: 100%;
+  }
+  .messaging-view--list .messaging-layout { width: 100%; max-width: 100%; min-height: 100%; height: 100%; }
+  .messaging-view--list .messaging-chats-header { padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
+
+  /* Full-screen chat thread */
+  .manager-shell:has(.messaging-layout--chat-open) .manager-tabs,
+  .manager-shell:has(.messaging-layout--chat-open) .manager-header { display: none; }
+  .manager-shell:has(.messaging-layout--chat-open) .manager-content { padding: 0; margin: 0; width: 100%; max-width: 100%; }
+
+  .messaging-layout--chat-open .messaging-chat {
+    position: fixed; inset: 0; z-index: 60;
+    min-height: 100dvh; height: 100dvh;
+    width: 100%; max-width: 100%; border-radius: 0;
+  }
+  .messaging-layout--chat-open .messaging-chat__header { padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+
+  .dashboard-view__header { display: none; }
+}
+
+/* ==========================================
+   DESKTOP SIDEBAR NAV — hide bottom nav, show side nav
+   ========================================== */
+@media (min-width: 1024px) {
+  /* Customer app: keep floating bottom nav but widen it a bit */
+  .bottom-nav { max-width: 580px; }
+}
+
+/* ==========================================
+   LANDSCAPE PHONES (short viewport, wide)
+   ========================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root {
+    --layout-top-offset: calc(52px + env(safe-area-inset-top, 0px));
+    --layout-bottom-offset: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .hero-card { height: 260px; }
+  .home-featured-stack { grid-template-columns: repeat(2, 1fr); }
+  .home-featured-stack .hero-card { height: 260px; }
+
+  /* Compact loyalty bar */
+  .loyalty-bar__progress { display: none; }
+
+  /* Bottom nav compact */
+  .bottom-nav { padding: 6px var(--space-md); }
+  .bottom-nav__item { padding: 6px 10px; }
+  .bottom-nav__label { display: none; }
+
+  /* Detail view */
+  .detail-view__floating-img { width: 200px; height: 200px; top: -60px; }
+  .detail-view__card-body { margin-top: 140px; }
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+@media print {
+  .bottom-nav, .top-app-bar, .nav-drawer, .nav-drawer-overlay,
+  .toast-container, .ambient-orbs { display: none !important; }
+
+  body { background: white !important; color: black !important; }
+  .product-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+}
+
+/* ==========================================
+   HIGH-CONTRAST / FORCED COLORS (accessibility)
+   ========================================== */
+@media (forced-colors: active) {
+  .category-chip,
+  .bottom-nav,
+  .product-card,
+  .hero-card,
+  .glass-panel {
+    border: 2px solid ButtonText;
+    forced-color-adjust: none;
+  }
+  .category-chip--active { background: Highlight; color: HighlightText; }
+}
+
+/* ==========================================
+   REDUCED MOTION (accessibility)
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .product-card:hover { transform: none; }
+  .hero-card:hover    { transform: none; }
+  .bottom-nav:hover   { transform: translateX(-50%); }
+  .category-chip:hover { transform: none; }
+  .category-chip--active { transform: none; }
+}
