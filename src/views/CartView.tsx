@@ -72,8 +72,8 @@ export default function CartView({ onNavigate }: Props) {
         ) : (
           <div className="promo-input-row">
             <input className="promo-input font-body-md" placeholder="Promo code" value={promoInput} onChange={e => setPromoInput(e.target.value)} />
-            <button className="promo-apply-btn font-label-md ripple-btn" onClick={() => {
-              const err = applyPromo(promoInput);
+            <button className="promo-apply-btn font-label-md ripple-btn" onClick={async () => {
+              const err = await applyPromo(promoInput);
               if (err) {
                 setPromoError(err);
                 addToast(err, 'error', 'error');

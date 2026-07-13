@@ -5,14 +5,13 @@ const CART_STORAGE_KEY = 'kwa_gavo_cart_v1';
 import { db } from '../config/firebase';
 import {
   collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc,
-  query, where, orderBy, limit,
+  query, where, orderBy, limit, getDoc,
 } from 'firebase/firestore';
 import { addToast } from '../utils/toast';
 import { useAuth, messageUserId } from './AuthContext';
 import { stripUndefined, mapFirestoreError } from '../utils/firestore';
-import type { AppMode, Product, CartItem, OrderStatus, OrderType, Order, Customer, Message, DailyStats, AppNotification } from './types';
+import type { AppMode, Product, CartItem, OrderStatus, OrderType, Order, Message, DailyStats, AppNotification } from './types';
 export * from './types';
-import { seedDatabase } from '../utils/seedFirebase';
 import type { SeedStatus } from '../utils/seedFirebase';
 
 export interface PromoCode {
@@ -49,7 +48,7 @@ interface StoreContextValue {
   cartCount: number;
   promoCode: string;
   promoDiscount: number;
-  applyPromo: (code: string) => string | null;
+  applyPromo: (code: string) => Promise<string | null>;
   removePromo: () => void;
 
   orders: Order[];
@@ -59,7 +58,6 @@ interface StoreContextValue {
   setActiveOrder: (o: Order | null) => void;
   visibleOrders: Order[];
 
-  customers: Customer[];
   notifications: AppNotification[];
   markNotificationRead: (id: string) => void;
 
@@ -91,7 +89,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const { user, userProfile, role, getOrderDisplayName, getOrderPhone } = useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [seedStatus, setSeedStatus] = useState<SeedStatus>('idle');
+  const [seedStatus, setSeedStatus] = useState<SeedStatus>('done');
   const [firestoreError, setFirestoreError] = useState<string | null>(null);
   const menuToastShown = useRef(false);
   const emptyMenuToastShown = useRef(false);
@@ -109,11 +107,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   });
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
-  const [customers, setCustomers] = useState<Customer[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [weeklyStats, setWeeklyStats] = useState<DailyStats[]>([]);
-  const [promoCodes, setPromoCodes] = useState<Record<string, PromoCode>>({});
   const [promoCode, setPromoCode] = useState('');
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -137,20 +133,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('online',  handleOnline);
     };
-  }, []);
-
-  useEffect(() => {
-    async function triggerClientSeed() {
-      try {
-        setSeedStatus('seeding');
-        const res = await seedDatabase();
-        setSeedStatus(res.status);
-      } catch (err) {
-        console.error('Failed to auto-seed database:', err);
-        setSeedStatus('error');
-      }
-    }
-    triggerClientSeed();
   }, []);
 
   const loyaltyPoints = userProfile?.loyaltyPoints ?? 0;
@@ -188,20 +170,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       ),
     );
 
-    unsubs.push(
-      onSnapshot(
-        collection(db, 'promoCodes'),
-        snapshot => {
-          const codes: Record<string, PromoCode> = {};
-          snapshot.docs.forEach(d => {
-            codes[d.id] = d.data() as PromoCode;
-          });
-          setPromoCodes(codes);
-        },
-        onError('promoCodes'),
-      ),
-    );
-
     const timeout = setTimeout(stopLoading, 8000);
 
     return () => {
@@ -214,7 +182,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isAdmin) {
       Promise.resolve().then(() => {
-        setCustomers([]);
         setWeeklyStats([]);
       });
       return;
@@ -234,17 +201,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           setMessages(msgData);
         },
         onError('messages'),
-      ),
-    );
-
-    unsubs.push(
-      onSnapshot(
-        collection(db, 'customers'),
-        snapshot => {
-          const custData = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Customer));
-          setCustomers(custData);
-        },
-        onError('customers'),
       ),
     );
 
@@ -449,15 +405,24 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const cartTotal = cart.reduce((s, i) => s + i.product.price * i.quantity, 0);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
 
-  const applyPromo = useCallback((code: string): string | null => {
+  const applyPromo = useCallback(async (code: string): Promise<string | null> => {
     const upper = code.toUpperCase().trim();
-    const promo = promoCodes[upper];
-    if (!promo) return 'Invalid promo code';
-    setPromoCode(upper);
-    const raw = cart.reduce((s, i) => s + i.product.price * i.quantity, 0);
-    setPromoDiscount(promo.type === 'percent' ? raw * promo.discount / 100 : promo.discount);
-    return null;
-  }, [cart, promoCodes]);
+    if (!upper) return 'Please enter a promo code';
+    try {
+      const docRef = doc(db, 'promoCodes', upper);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) return 'Invalid promo code';
+      
+      const promo = docSnap.data() as PromoCode;
+      setPromoCode(upper);
+      const raw = cart.reduce((s, i) => s + i.product.price * i.quantity, 0);
+      setPromoDiscount(promo.type === 'percent' ? Math.round(raw * promo.discount / 100) : promo.discount);
+      return null;
+    } catch (err) {
+      console.error('Failed to validate promo code:', err);
+      return 'Error validating promo code';
+    }
+  }, [cart]);
 
   const removePromo = useCallback(() => { setPromoCode(''); setPromoDiscount(0); }, []);
 
@@ -561,16 +526,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         updatedAt: nowIso,
       });
     } else {
-      const cust = customers.find(c => c.id === userId);
       await addDoc(collection(db, 'messages'), {
         userId,
         customerId: userId,
-        customerName: customerName || cust?.name || userProfile?.displayName || 'Customer',
+        customerName: customerName || userProfile?.displayName || 'Customer',
         messages: [{ sender, text, time }],
         updatedAt: nowIso,
       });
     }
-  }, [customers, messages, userProfile]);
+  }, [messages, userProfile]);
 
   const markNotificationRead = useCallback(async (id: string) => {
     await updateDoc(doc(db, 'notifications', id), { read: true });
@@ -595,12 +559,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       cart, addToCart, updateQty, removeFromCart, clearCart, cartTotal, cartCount,
       promoCode, promoDiscount, applyPromo, removePromo,
       orders, activeOrder, placeOrder, updateOrderStatus, setActiveOrder, visibleOrders,
-      customers, notifications, markNotificationRead,
+      notifications, markNotificationRead,
       messages, sendMessage,
       loyaltyPoints, loyaltyTier, streakDays,
       weeklyStats, todayRevenue, todayOrders, avgPrepTime,
       showConfetti, triggerConfetti,
-    }}>
+    } as any}>
       {children}
     </StoreContext.Provider>
   );

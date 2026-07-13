@@ -43,10 +43,9 @@ service cloud.firestore {
 
       // Admins and hardcoded-admin emails may update any field (including role).
       // Regular owners may update only non-privileged fields.
-      allow update: if isAdmin() || isHardcodedAdminEmail() || (
-        isOwner(userId) &&
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'loyaltyPoints', 'tier', 'streakDays'])
-      );
+      allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'loyaltyPoints', 'tier', 'streakDays']))
+        || isHardcodedAdminEmail()
+        || isAdmin();
 
       allow delete: if isAdmin();
     }
@@ -57,7 +56,7 @@ service cloud.firestore {
     }
 
     match /orders/{orderId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow read: if (isSignedIn() && resource.data.userId == request.auth.uid) || isAdmin();
       allow create: if isSignedIn()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.keys().hasAll(['userId', 'customer', 'status', 'total'])
@@ -69,21 +68,19 @@ service cloud.firestore {
     }
 
     match /messages/{messageId} {
-      allow read: if isAdmin()
-        || (isSignedIn() && (
+      allow read: if (isSignedIn() && (
           resource.data.userId == request.auth.uid
           || resource.data.customerId == request.auth.uid
-        ));
+        )) || isAdmin();
       allow create: if isSignedIn() && (
         (request.resource.data.userId == request.auth.uid && request.resource.data.customerId == request.auth.uid)
         || isAdmin()
       );
-      allow update: if isAdmin()
-        || (isSignedIn() && (
+      allow update: if (isSignedIn() && (
           (resource.data.userId == request.auth.uid || resource.data.customerId == request.auth.uid)
           && request.resource.data.userId == resource.data.userId
           && request.resource.data.customerId == resource.data.customerId
-        ));
+        )) || isAdmin();
       allow delete: if isAdmin();
     }
 
@@ -101,17 +98,18 @@ service cloud.firestore {
     }
 
     match /promoCodes/{codeId} {
-      allow read: if true;
+      allow get: if true;
+      allow list: if isAdmin();
       allow write: if isAdmin();
     }
 
     match /weeklyStats/{docId} {
-      allow read: if true;
+      allow read: if isAdmin();
       allow write: if isAdmin();
     }
 
     match /meta/{docId} {
-      allow read: if true;
+      allow read: if isAdmin();
       allow write: if isAdmin();
     }
   }
