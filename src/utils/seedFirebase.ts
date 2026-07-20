@@ -2,10 +2,6 @@ import { collection, doc, getDoc, getDocs, setDoc, deleteDoc } from 'firebase/fi
 import { db } from '../config/firebase';
 import {
   INITIAL_PRODUCTS,
-  MOCK_CUSTOMERS,
-  MOCK_ORDERS,
-  MOCK_MESSAGES,
-  MOCK_STATS,
   PROMO_CODES,
 } from '../data/seedData';
 import { SEED_VERSION } from '../data/seedConstants';
@@ -92,13 +88,8 @@ export async function seedDatabase(): Promise<SeedResult> {
         console.warn(`Failed to delete order ${docRef.id}:`, e);
       }
     }
-    console.log('Seeding mock orders...');
-    for (const order of MOCK_ORDERS) {
-      const { id, ...data } = order;
-      await setDoc(doc(db, 'orders', id), data);
-    }
 
-    // 4. Overwrite/seed mock customers
+    // 4. Overwrite/seed mock customers (we clear it completely and stop seeding)
     const customersSnap = await getDocs(collection(db, 'customers'));
     for (const docRef of customersSnap.docs) {
       try {
@@ -107,13 +98,8 @@ export async function seedDatabase(): Promise<SeedResult> {
         console.warn(`Failed to delete customer ${docRef.id}:`, e);
       }
     }
-    console.log('Seeding mock customers...');
-    for (const customer of MOCK_CUSTOMERS) {
-      const { id, ...data } = customer;
-      await setDoc(doc(db, 'customers', id), data);
-    }
 
-    // 5. Overwrite/seed mock messages
+    // 5. Overwrite/seed mock messages (we clear it completely and stop seeding)
     const messagesSnap = await getDocs(collection(db, 'messages'));
     for (const docRef of messagesSnap.docs) {
       try {
@@ -122,14 +108,13 @@ export async function seedDatabase(): Promise<SeedResult> {
         console.warn(`Failed to delete message ${docRef.id}:`, e);
       }
     }
-    console.log('Seeding mock messages...');
-    for (const message of MOCK_MESSAGES) {
-      const { id, ...data } = message;
-      await setDoc(doc(db, 'messages', id), data);
-    }
 
-    // 6. Overwrite weekly stats
-    await setDoc(doc(db, 'weeklyStats', 'current'), { days: MOCK_STATS });
+    // 6. Overwrite weekly stats (we delete the document as stats are computed dynamically)
+    try {
+      await deleteDoc(doc(db, 'weeklyStats', 'current'));
+    } catch (e) {
+      console.warn('Failed to delete weeklyStats doc:', e);
+    }
 
     // 7. Overwrite promo codes
     const promoSnap = await getDocs(collection(db, 'promoCodes'));

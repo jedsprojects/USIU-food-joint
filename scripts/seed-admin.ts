@@ -4,13 +4,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import {
   SEED_VERSION,
   buildProductMapWithCloudinary,
-  remapOrderProducts,
   productToFirestoreData,
-  orderToFirestoreData,
-  MOCK_CUSTOMERS,
-  MOCK_ORDERS,
-  MOCK_MESSAGES,
-  MOCK_STATS,
   PROMO_CODES,
 } from './seed-shared';
 
@@ -60,45 +54,36 @@ async function main() {
     }
     console.log(`Seeded ${productMap.size} products`);
 
-    console.log('Seeding orders...');
-    for (const order of MOCK_ORDERS) {
-      const remapped = remapOrderProducts(order, productMap);
-      await db.doc(`orders/${order.id}`).set(orderToFirestoreData(remapped));
+    // Clean up old demo orders
+    console.log('Cleaning up old orders...');
+    const ordersSnap = await db.collection('orders').get();
+    for (const docRef of ordersSnap.docs) {
+      await docRef.ref.delete();
     }
-    console.log(`Seeded ${MOCK_ORDERS.length} orders`);
+
+    // Clean up old messages
+    console.log('Cleaning up old messages...');
+    const messagesSnap = await db.collection('messages').get();
+    for (const docRef of messagesSnap.docs) {
+      await docRef.ref.delete();
+    }
+
+    // Clean up old customers collection
+    console.log('Cleaning up obsolete customers collection...');
+    const customersSnap = await db.collection('customers').get();
+    for (const docRef of customersSnap.docs) {
+      await docRef.ref.delete();
+    }
+
+    // Clean up weeklyStats doc
+    console.log('Cleaning up weeklyStats document...');
+    await db.doc('weeklyStats/current').delete().catch(() => {});
 
     await db.doc('meta/seed').set({
       version: SEED_VERSION,
       seededAt: new Date().toISOString(),
     });
     console.log(`Updated meta/seed to version ${SEED_VERSION}`);
-  }
-
-  const customersSnap = await db.collection('customers').get();
-  if (customersSnap.empty) {
-    console.log('Seeding customers...');
-    for (const customer of MOCK_CUSTOMERS) {
-      const { id, ...data } = customer;
-      await db.doc(`customers/${id}`).set(data);
-    }
-    console.log(`Seeded ${MOCK_CUSTOMERS.length} customers`);
-  }
-
-  const messagesSnap = await db.collection('messages').get();
-  if (messagesSnap.empty) {
-    console.log('Seeding messages...');
-    for (const message of MOCK_MESSAGES) {
-      const { id, ...data } = message;
-      await db.doc(`messages/${id}`).set(data);
-    }
-    console.log(`Seeded ${MOCK_MESSAGES.length} message threads`);
-  }
-
-  const statsSnap = await db.collection('weeklyStats').get();
-  if (statsSnap.empty) {
-    console.log('Seeding weekly stats...');
-    await db.doc('weeklyStats/current').set({ days: MOCK_STATS });
-    console.log('Seeded weekly stats');
   }
 
   const promoSnap = await db.collection('promoCodes').get();

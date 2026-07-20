@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 
 const CART_STORAGE_KEY = 'kwa_gavo_cart_v1';
 import { db } from '../config/firebase';
@@ -109,7 +109,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const [weeklyStats, setWeeklyStats] = useState<DailyStats[]>([]);
   const [promoCode, setPromoCode] = useState('');
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -182,7 +181,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isAdmin) {
       Promise.resolve().then(() => {
-        setWeeklyStats([]);
+        setMessages([]);
       });
       return;
     }
@@ -201,17 +200,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           setMessages(msgData);
         },
         onError('messages'),
-      ),
-    );
-
-    unsubs.push(
-      onSnapshot(
-        doc(db, 'weeklyStats', 'current'),
-        snapshot => {
-          const days = snapshot.data()?.days as DailyStats[] | undefined;
-          setWeeklyStats(days ?? []);
-        },
-        onError('weeklyStats'),
       ),
     );
 
@@ -264,7 +252,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     };
 
     const ordersRef = isAdmin
-      ? query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(100))
+      ? query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(1000))
       : query(collection(db, 'orders'), where('userId', '==', user.uid));
 
 
@@ -540,9 +528,76 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     await updateDoc(doc(db, 'notifications', id), { read: true });
   }, []);
 
-  const todayOrders = orders.filter(o => o.status !== 'cancelled').length;
-  const todayRevenue = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + o.total, 0);
-  const avgPrepTime = 14;
+  const todayStr = new Date().toDateString();
+
+  const todayOrders = useMemo(() => {
+    return orders.filter(o => {
+      return o.status !== 'cancelled' && new Date(o.createdAt).toDateString() === todayStr;
+    }).length;
+  }, [orders, todayStr]);
+
+  const todayRevenue = useMemo(() => {
+    return Math.round(orders.filter(o => {
+      return o.status !== 'cancelled' && new Date(o.createdAt).toDateString() === todayStr;
+    }).reduce((s, o) => s + o.total, 0));
+  }, [orders, todayStr]);
+
+  const avgPrepTime = useMemo(() => {
+    let targetOrders = orders.filter(o => 
+      o.status === 'delivered' && 
+      new Date(o.createdAt).toDateString() === todayStr &&
+      o.createdAt && 
+      o.updatedAt
+    );
+    if (targetOrders.length === 0) {
+      targetOrders = orders.filter(o => o.status === 'delivered' && o.createdAt && o.updatedAt);
+    }
+    if (targetOrders.length === 0) return 14; // Default fallback to 14 mins
+
+    const totalPrepTime = targetOrders.reduce((sum, o) => {
+      const diffMins = (new Date(o.updatedAt).getTime() - new Date(o.createdAt).getTime()) / 60000;
+      return sum + (diffMins > 0 ? diffMins : 14);
+    }, 0);
+    return Math.round(totalPrepTime / targetOrders.length);
+  }, [orders, todayStr]);
+
+  const weeklyStats = useMemo<DailyStats[]>(() => {
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const result: DailyStats[] = [];
+    const statsMap: Record<string, { revenue: number; ordersCount: number }> = {};
+
+    // Initialize last 7 days ending today (chronological order)
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dayName = daysOfWeek[d.getDay()];
+      statsMap[dayName] = { revenue: 0, ordersCount: 0 };
+      result.push({ date: dayName, revenue: 0, orders: 0 });
+    }
+
+    // Populate with real order data from the last 7 days
+    orders.forEach(o => {
+      if (o.status === 'cancelled') return;
+      const orderDate = new Date(o.createdAt);
+      
+      const diffTime = new Date().getTime() - orderDate.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      
+      if (diffDays >= 0 && diffDays <= 7) {
+        const dayName = daysOfWeek[orderDate.getDay()];
+        if (statsMap[dayName]) {
+          statsMap[dayName].revenue += o.total;
+          statsMap[dayName].ordersCount += 1;
+        }
+      }
+    });
+
+    return result.map(r => ({
+      date: r.date,
+      revenue: Math.round(statsMap[r.date].revenue),
+      orders: statsMap[r.date].ordersCount,
+    }));
+  }, [orders]);
 
   const triggerConfetti = useCallback(() => {
     setShowConfetti(true);

@@ -1,7 +1,46 @@
+import { useMemo } from 'react';
 import { useStore } from '../../context/StoreContext';
 
 export default function DashboardView() {
-  const { todayRevenue, todayOrders, avgPrepTime, orders, weeklyStats } = useStore();
+  const { todayRevenue, todayOrders, avgPrepTime, orders, weeklyStats, products } = useStore();
+
+  // Calculate overall rating and review counts dynamically from the products in the catalog
+  const totalRating = products.reduce((s, p) => s + (p.rating ?? 0), 0);
+  const totalReviews = products.reduce((s, p) => s + (p.reviews ?? 0), 0);
+  const avgRating = products.length > 0 ? (totalRating / products.length).toFixed(2) : '4.8';
+
+  // Calculate busy hours load dynamically from actual orders
+  const busiestHours = useMemo(() => {
+    const slots = [
+      { label: '11 AM – 12 PM', startHour: 11, endHour: 12, count: 0 },
+      { label: '12 PM – 1 PM', startHour: 12, endHour: 13, count: 0 },
+      { label: '1 PM – 2 PM', startHour: 13, endHour: 14, count: 0 },
+      { label: '2 PM – 3 PM', startHour: 14, endHour: 15, count: 0 },
+    ];
+
+    orders.forEach(o => {
+      if (o.status === 'cancelled') return;
+      const date = new Date(o.createdAt);
+      const hour = date.getHours();
+      const slot = slots.find(s => hour >= s.startHour && hour < s.endHour);
+      if (slot) slot.count++;
+    });
+
+    const maxCount = Math.max(...slots.map(s => s.count), 1);
+    
+    return slots.map(s => {
+      const percentage = Math.round((s.count / maxCount) * 100);
+      let color = 'rgba(200, 150, 168, 0.2)';
+      if (percentage >= 75) {
+        color = 'var(--color-primary)';
+      } else if (percentage >= 40) {
+        color = 'var(--color-tertiary-fixed)';
+      } else if (percentage >= 15) {
+        color = 'rgba(200, 150, 168, 0.4)';
+      }
+      return { hour: s.label, load: `${percentage}%`, color };
+    });
+  }, [orders]);
 
   // Calculate order counts per status
   const pendingCount = orders.filter(o => o.status === 'pending').length;
@@ -60,9 +99,9 @@ export default function DashboardView() {
             <span className="font-label-md" style={{ color: 'var(--color-on-surface-variant)' }}>Rating</span>
             <span className="material-symbols-outlined fill-1" style={{ color: 'var(--color-tertiary)', fontSize: '18px' }}>star</span>
           </div>
-          <h3 className="font-headline-lg-mobile" style={{ color: '#fff', fontSize: '24px' }}>4.85 / 5</h3>
+          <h3 className="font-headline-lg-mobile" style={{ color: '#fff', fontSize: '24px' }}>{avgRating} / 5</h3>
           <span className="font-label-md" style={{ color: 'var(--color-on-surface-variant)', fontSize: '11px', display: 'block', marginTop: '4px' }}>
-            From 642 reviews this month
+            From {totalReviews} reviews in catalog
           </span>
         </div>
       </div>
@@ -133,12 +172,7 @@ export default function DashboardView() {
         <p className="font-body-md" style={{ color: 'var(--color-on-surface-variant)', fontSize: '13px', marginBottom: '16px' }}>Peak rush typically is during lunchtime (12:00 PM – 1:30 PM).</p>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {[
-            { hour: '11 AM – 12 PM', load: '30%', color: 'rgba(200, 150, 168, 0.2)' },
-            { hour: '12 PM – 1 PM', load: '95%', color: 'var(--color-primary)' },
-            { hour: '1 PM – 2 PM', load: '85%', color: 'var(--color-tertiary-fixed)' },
-            { hour: '2 PM – 3 PM', load: '40%', color: 'rgba(200, 150, 168, 0.4)' },
-          ].map((h, i) => (
+          {busiestHours.map((h, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span className="font-label-md" style={{ color: 'var(--color-on-surface)', width: '90px', fontSize: '12px' }}>{h.hour}</span>
               <div style={{ flex: 1, height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>

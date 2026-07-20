@@ -24,25 +24,24 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
+      // Users can read their own profile; admins can list/read all for CRM
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
 
-      // Hardcoded admins may create their own doc with role='admin'.
-      // All other users may only self-create with safe starting values.
+      // Any signed-in user may create their own profile document.
+      // Hardcoded admins may set role='admin'; everyone else is forced to 'customer'.
       allow create: if isSignedIn() && request.auth.uid == userId && (
         (
           isHardcodedAdminEmail() &&
           request.resource.data.get('role', 'customer') == 'admin'
         ) || (
           !isHardcodedAdminEmail() &&
-          request.resource.data.get('role', 'customer') == 'customer' &&
-          request.resource.data.get('loyaltyPoints', 0) == 0 &&
-          request.resource.data.get('tier', 'Gavo Regular') == 'Gavo Regular' &&
-          request.resource.data.get('streakDays', 0) == 0
+          request.resource.data.get('role', 'customer') == 'customer'
         )
       );
 
+      // Owners may update any field except privileged ones.
       // Admins and hardcoded-admin emails may update any field (including role).
-      // Regular owners may update only non-privileged fields.
       allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'loyaltyPoints', 'tier', 'streakDays']))
         || isHardcodedAdminEmail()
         || isAdmin();
