@@ -69,7 +69,14 @@ export default function PreOrderView({ onNavigate }: Props) {
         }
       }
 
-      await placeOrder(orderType, finalTime, mpesaScreenshot || undefined, finalAddress);
+      await placeOrder(
+        orderType,
+        finalTime,
+        mpesaScreenshot || undefined,
+        finalAddress,
+        guestName.trim(),
+        guestPhone.trim()
+      );
       triggerConfetti();
       addToast(
         orderType === 'pickup' ? '🎉 Order placed! Skip the queue.' : '🛵 Order placed! Delivery on the way.',

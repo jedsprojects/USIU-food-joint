@@ -9,7 +9,7 @@ service cloud.firestore {
     function isAdmin() {
       return isSignedIn() &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'customer') == 'admin';
     }
 
     function isOwner(userId) {
@@ -19,30 +19,29 @@ service cloud.firestore {
     // Detects hardcoded admin emails via the Firebase Auth token — never trusts the client body.
     function isHardcodedAdminEmail() {
       return isSignedIn()
-        && request.auth.token.email != null
+        && 'email' in request.auth.token
         && request.auth.token.email in ['admin@kwagavo.com'];
     }
 
     match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
+      // Users can read their own profile; admins can list/read all for CRM
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
 
-      // Hardcoded admins may create their own doc with role='admin'.
-      // All other users may only self-create with safe starting values.
+      // Any signed-in user may create their own profile document.
+      // Hardcoded admins may set role='admin'; everyone else is forced to 'customer'.
       allow create: if isSignedIn() && request.auth.uid == userId && (
         (
           isHardcodedAdminEmail() &&
           request.resource.data.get('role', 'customer') == 'admin'
         ) || (
           !isHardcodedAdminEmail() &&
-          request.resource.data.get('role', 'customer') == 'customer' &&
-          request.resource.data.get('loyaltyPoints', 0) == 0 &&
-          request.resource.data.get('tier', 'Gavo Regular') == 'Gavo Regular' &&
-          request.resource.data.get('streakDays', 0) == 0
+          request.resource.data.get('role', 'customer') == 'customer'
         )
       );
 
+      // Owners may update any field except privileged ones.
       // Admins and hardcoded-admin emails may update any field (including role).
-      // Regular owners may update only non-privileged fields.
       allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'loyaltyPoints', 'tier', 'streakDays']))
         || isHardcodedAdminEmail()
         || isAdmin();
@@ -58,8 +57,8 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow read: if (isSignedIn() && resource.data.userId == request.auth.uid) || isAdmin();
       allow create: if isSignedIn()
-        && request.resource.data.userId == request.auth.uid
         && request.resource.data.keys().hasAll(['userId', 'customer', 'status', 'total'])
+        && request.resource.data.userId == request.auth.uid
         && request.resource.data.status == 'pending'
         && request.resource.data.total >= 0
         && request.resource.data.get('subtotal', 0) >= 0;
