@@ -53,7 +53,14 @@ interface StoreContextValue {
 
   orders: Order[];
   activeOrder: Order | null;
-  placeOrder: (type: OrderType, scheduledTime?: string, mpesaScreenshot?: string, deliveryAddress?: string) => Promise<Order>;
+  placeOrder: (
+    type: OrderType,
+    scheduledTime?: string,
+    mpesaScreenshot?: string,
+    deliveryAddress?: string,
+    overrideName?: string,
+    overridePhone?: string
+  ) => Promise<Order>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   setActiveOrder: (o: Order | null) => void;
   visibleOrders: Order[];
@@ -419,11 +426,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     scheduledTime?: string,
     mpesaScreenshot?: string,
     deliveryAddress?: string,
+    overrideName?: string,
+    overridePhone?: string,
   ) => {
     if (!user) throw new Error('Must be signed in to place an order');
 
-    const displayName = getOrderDisplayName();
-    const phone = getOrderPhone();
+    const displayName = overrideName || getOrderDisplayName();
+    const phone = overridePhone || getOrderPhone();
     if (!displayName.trim()) throw new Error('Name is required');
 
     const subtotal = cart.reduce((s, i) => s + i.product.price * i.quantity, 0);

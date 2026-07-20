@@ -9,7 +9,7 @@ service cloud.firestore {
     function isAdmin() {
       return isSignedIn() &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'customer') == 'admin';
     }
 
     function isOwner(userId) {
@@ -19,7 +19,7 @@ service cloud.firestore {
     // Detects hardcoded admin emails via the Firebase Auth token — never trusts the client body.
     function isHardcodedAdminEmail() {
       return isSignedIn()
-        && request.auth.token.email != null
+        && 'email' in request.auth.token
         && request.auth.token.email in ['admin@kwagavo.com'];
     }
 
@@ -57,8 +57,8 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow read: if (isSignedIn() && resource.data.userId == request.auth.uid) || isAdmin();
       allow create: if isSignedIn()
-        && request.resource.data.userId == request.auth.uid
         && request.resource.data.keys().hasAll(['userId', 'customer', 'status', 'total'])
+        && request.resource.data.userId == request.auth.uid
         && request.resource.data.status == 'pending'
         && request.resource.data.total >= 0
         && request.resource.data.get('subtotal', 0) >= 0;

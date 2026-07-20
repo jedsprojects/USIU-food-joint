@@ -5,6 +5,7 @@ import {
   initializeFirestore,
   persistentLocalCache,
   persistentSingleTabManager,
+  getFirestore,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -23,11 +24,19 @@ export const auth = getAuth(app);
 // Enable persistent IndexedDB cache with multi-tab synchronisation.
 // onSnapshot listeners will immediately serve cached data when offline,
 // and writes (addDoc / setDoc) are queued locally and flushed when reconnected.
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentSingleTabManager({ forceOwnership: true }),
-  }),
-});
+let dbInstance;
+try {
+  dbInstance = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentSingleTabManager({ forceOwnership: true }),
+    }),
+  });
+} catch (e) {
+  // Catch already-initialized error on hot reload, reuse the existing instance
+  dbInstance = getFirestore(app);
+}
+
+export const db = dbInstance;
 
 if (typeof window !== 'undefined') {
   isSupported().then(supported => {
